@@ -7,7 +7,3 @@ Be sure you have lib boost, cmake, and python2.7 installed. On Ubuntu, that's:
 ```bash
 $ sudo apt-get install libboost-dev cmake python2.7-dev
 ```
-
-Install cmake.
-
-Python 2.7
