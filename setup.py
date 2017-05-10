@@ -85,6 +85,7 @@ setup(
     extras_require={
         'dev': ['ipython<6','twine'],
     },
+    install_requires=["pyelftools"],
     keywords='symbolic execution triton',
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
     cmdclass={
