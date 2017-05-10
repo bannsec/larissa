@@ -83,7 +83,7 @@ setup(
         'Environment :: Console'
     ],
     extras_require={
-        'dev': ['ipython','twine'],
+        'dev': ['ipython<6','twine'],
     },
     keywords='symbolic execution triton',
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
