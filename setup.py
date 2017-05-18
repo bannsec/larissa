@@ -2,55 +2,45 @@
 from setuptools import setup, find_packages
 # To use a consistent encoding
 from codecs import open
-import os
+import os, sys
 from setuptools.command.install import install
 import tempfile
 import shutil
 import urllib2
 import tarfile
 from glob import glob
+import multiprocessing
 
 here = os.path.abspath(os.path.dirname(__file__))
 
 long_description = "See website for more info."
 
 def _install_z3():
-    # Wheel files don't come with the z3 executable. Need to build.
-    os.system("pip install --no-binary :all: z3-solver")
+    # Need to build this.
+    # TODO: Remove this from my package once z3-solver gets updated to install the binary
+
+    os.chdir(os.path.join(here,"lib","z3"))
+
+    os.system("python scripts/mk_make.py --python")
+    os.chdir("build")
+    os.system("make install -j{0}".format(multiprocessing.cpu_count()))
+
+    os.chdir(here)
 
 def _install_capstone():
     # Triton needs the deps that the wheel file doesn't have
     os.system("pip install --no-binary :all: capstone")
 
 def _install_triton():
-    # Triton isn't quite a package yet.
-    dirpath = tempfile.mkdtemp()
-
-    tgz_name = os.path.join(dirpath,"master.tar.gz")
-
-    with open(tgz_name,"wb") as f:
-        # Grab the current version
-        response = urllib2.urlopen("https://github.com/JonathanSalwan/Triton/archive/master.tar.gz")
-        f.write(response.read())
-        response.close()
-
-    os.chdir(dirpath)
-
-    # Extract it
-    tar = tarfile.open(tgz_name)
-    tar.extractall()
-    tar.close()
-
-    # Move into dir and compile stuff
-    os.chdir(glob("Triton*")[0])
+    # Using triton version included in larissa due to triton not being in pypi
+    os.chdir(os.path.join(here,"lib","triton"))
     os.mkdir("build")
     os.chdir("build")
 
-    os.system("cmake -DCMAKE_INSTALL_PREFIX={0} ..".format(os.environ['VIRTUAL_ENV']))
-    os.system("make -j2 install")
+    os.system("cmake -DCMAKE_INSTALL_PREFIX={0} ..".format(sys.prefix))
+    os.system("make -j{0} install".format(multiprocessing.cpu_count()))
 
-    shutil.rmtree(dirpath)
-
+    os.chdir(here)
 
 class CustomInstallCommand(install):
     """Need to custom compile some things."""
