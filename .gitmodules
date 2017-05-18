@@ -1,0 +1,6 @@
+[submodule "lib/z3"]
+	path = lib/z3
+	url = https://github.com/Z3Prover/z3.git
+[submodule "lib/triton"]
+	path = lib/triton
+	url = https://github.com/JonathanSalwan/Triton.git
