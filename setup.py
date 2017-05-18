@@ -67,7 +67,7 @@ class CustomInstallCommand(install):
 
 setup(
     name='larissa',
-    version='0.0.1',
+    version='0.0.2',
     description='Tool to automate working with Triton',
     long_description=long_description,
     url='https://github.com/owlz/larissa',
@@ -87,7 +87,7 @@ setup(
     },
     install_requires=["pyelftools"],
     keywords='symbolic execution triton',
-    packages=find_packages(exclude=['contrib', 'docs', 'tests']),
+    packages=find_packages(exclude=['contrib', 'docs', 'tests','lib']),
     cmdclass={
         'install': CustomInstallCommand,
     },
