@@ -27,7 +27,7 @@ class Loader(object):
             raise Exception("How did i get here")
 
         # Define symbolic optimizations
-        enableMode(MODE.ALIGNED_MEMORY, True)
+        enableMode(MODE.ALIGNED_MEMORY, False) # TODO: Apparently True is faster? Makes memory access irritating though...
         enableMode(MODE.ONLY_ON_SYMBOLIZED, True)
 
         elf = Elf(self.project.filename)
@@ -36,14 +36,17 @@ class Loader(object):
         # Load sections #
         #################
 
-        raw = elf.getRaw()
-        phdrs = elf.getProgramHeaders()
-        for phdr in phdrs:
-            offset = phdr.getOffset()
-            size   = phdr.getFilesz()
-            vaddr  = phdr.getVaddr()
-            logger.debug('Loading 0x%06x - 0x%06x' %(vaddr, vaddr+size))
-            setConcreteMemoryAreaValue(vaddr, raw[offset:offset+size])
+        # TODO: Incorporate map permissions
+        # TODO: Integrate with page objects
+        # TODO: Don't allow overlaps
+        # TODO: Support loading at different address
+
+        for section in self.sections:
+            size   = section.header['sh_size']
+            vaddr  = section.header['sh_addr']
+            name   = section.name
+            logger.debug('Loading 0x%08x - 0x%08x -- %s' %(vaddr, vaddr+size, name))
+            setConcreteMemoryAreaValue(vaddr, section.data())
 
         ###############
         # Relocations #
@@ -69,6 +72,15 @@ class Loader(object):
 
         return elf
         
+
+    def get_section(self, name):
+        """Returns the section object for the given section name or None if not found."""
+
+        for section in self.sections:
+            if section.name == name:
+                return section
+
+        return None
 
     ##############
     # Properties #

@@ -7,7 +7,7 @@ class Factory(object):
         self.project = project
 
     def entry_state(self):
-        return State()
+        return State(self.project)
 
 
     ##############
