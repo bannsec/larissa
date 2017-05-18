@@ -8,8 +8,10 @@ class Loader(object):
 
         self.file = open(self.project.filename,"rb")
 
-    def initialize(self):
+    def initialize(self, state):
         """Return an init triton object for the relevant architecture."""
+
+        # TODO: Triton works on a global state right now... Update this once Triton gives actual contexts to work with
 
         # TODO: Call this smartly basied on if it's ELF or PE
 
