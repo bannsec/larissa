@@ -1,8 +1,12 @@
+import logging
+logger = logging.getLogger("Loader")
 
 class Loader(object):
 
     def __init__(self, project):
         self.project = project
+
+        self.file = open(self.project.filename,"rb")
 
     def initialize(self):
         """Return an init triton object for the relevant architecture."""
@@ -36,7 +40,7 @@ class Loader(object):
             offset = phdr.getOffset()
             size   = phdr.getFilesz()
             vaddr  = phdr.getVaddr()
-            #debug('Loading 0x%06x - 0x%06x' %(vaddr, vaddr+size))
+            logger.debug('Loading 0x%06x - 0x%06x' %(vaddr, vaddr+size))
             setConcreteMemoryAreaValue(vaddr, raw[offset:offset+size])
 
         ###############
@@ -71,11 +75,11 @@ class Loader(object):
     @property
     def arch(self):
         """Returns the arch for this file. Either x86 or x64."""
-        with open(self.project.filename,"rb") as f:
-            elffile = ELFFile(f)
-            arch = elffile.get_machine_arch().lower()
-            assert arch in ["x86","x64"]
-            return arch
+
+        elffile = ELFFile(self.file)
+        arch = elffile.get_machine_arch().lower()
+        assert arch in ["x86","x64"]
+        return arch
 
     @property
     def project(self):
@@ -87,6 +91,25 @@ class Loader(object):
             raise Exception("Invalid project of type {0}".format(type(project)))
 
         self.__project = project
+
+    @property
+    def file(self):
+        """Python file object for the binary opened in read-only mode."""
+        return self.__file
+
+    @file.setter
+    def file(self, f):
+        if type(f) is not file:
+            raise Exception("Invalid file property of type {0}".format(type(f)))
+
+        self.__file = f
+
+    @property
+    def sections(self):
+        """Returns generator of section information."""
+
+        elffile = ELFFile(self.file)
+        return elffile.iter_sections()
 
 
 from elftools.elf.elffile import ELFFile
