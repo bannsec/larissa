@@ -1,5 +1,7 @@
 
-class ELF(object):
+from larissa.Loader import Loader
+
+class ELF(Loader):
     """Abstract loading an ELF object."""
 
     def __init__(self, project):
@@ -115,6 +117,7 @@ class ELF(object):
         arch = self.elffile.get_machine_arch().lower()
         assert arch in ["x86","x64"]
         return arch
+
 
 from elftools.elf.elffile import ELFFile
 from larissa.Project import Project
