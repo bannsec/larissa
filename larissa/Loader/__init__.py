@@ -7,6 +7,8 @@ class Loader(object):
         self.project = project
 
         self.file = open(self.project.filename,"rb")
+        self.elffile = ELFFile(self.file)
+
 
     def initialize(self, state):
         """Return an init triton object for the relevant architecture."""
@@ -40,8 +42,11 @@ class Loader(object):
         # TODO: Integrate with page objects
         # TODO: Don't allow overlaps
         # TODO: Support loading at different address
+        
+        # Not all sections are loadable
+        loadable_sections = [section for section in self.sections if section['sh_flags'] & 2]
 
-        for section in self.sections:
+        for section in loadable_sections:
             size   = section.header['sh_size']
             vaddr  = section.header['sh_addr']
             name   = section.name
@@ -73,25 +78,37 @@ class Loader(object):
         return elf
         
 
-    def get_section(self, name):
-        """Returns the section object for the given section name or None if not found."""
+    def get_section(self, section):
+        """Returns the section object for the given section name or number or None if not found."""
 
-        for section in self.sections:
-            if section.name == name:
-                return section
+        if type(section) is str:
+            return self.elffile.get_section_by_name(section)
 
-        return None
+        elif type(section) is int:
+            return self.elffile.get_section(section)
+
+        else:
+            raise Exception("Unknown section type of {0}".format(type(section)))
+
 
     ##############
     # Properties #
     ##############
 
     @property
+    def elffile(self):
+        """pyelftools elf file object."""
+        return self.__elffile
+
+    @elffile.setter
+    def elffile(self, elffile):
+        self.__elffile = elffile
+
+    @property
     def arch(self):
         """Returns the arch for this file. Either x86 or x64."""
 
-        elffile = ELFFile(self.file)
-        arch = elffile.get_machine_arch().lower()
+        arch = self.elffile.get_machine_arch().lower()
         assert arch in ["x86","x64"]
         return arch
 
@@ -122,8 +139,7 @@ class Loader(object):
     def sections(self):
         """Returns generator of section information."""
 
-        elffile = ELFFile(self.file)
-        return elffile.iter_sections()
+        return self.elffile.iter_sections()
 
 
 from elftools.elf.elffile import ELFFile
