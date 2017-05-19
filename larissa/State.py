@@ -31,6 +31,6 @@ class State(object):
     def binary(self, binary):
         self.__binary = binary
 
-from triton import *
+import triton
 from larissa.Project import Project
 
