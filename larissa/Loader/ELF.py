@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger("larissa.Loader.ELF")
 
 from larissa.Loader import Loader
 
@@ -20,17 +22,17 @@ class ELF(Loader):
         arch = self.arch
 
         if arch == "x86":
-            triton.setArchitecture(ARCH.X86)
+            triton.setArchitecture(triton.ARCH.X86)
 
         elif arch == "x64":
-            triton.setArchitecture(ARCH.X86_64)
+            triton.setArchitecture(triton.ARCH.X86_64)
 
         else:
             raise Exception("How did i get here")
 
         # Define symbolic optimizations
-        triton.enableMode(MODE.ALIGNED_MEMORY, False) # TODO: Apparently True is faster? Makes memory access irritating though...
-        triton.enableMode(MODE.ONLY_ON_SYMBOLIZED, True)
+        triton.enableMode(triton.MODE.ALIGNED_MEMORY, False) # TODO: Apparently True is faster? Makes memory access irritating though...
+        triton.enableMode(triton.MODE.ONLY_ON_SYMBOLIZED, True)
 
         elf = triton.Elf(self.project.filename)
         

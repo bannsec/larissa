@@ -1,5 +1,5 @@
 import logging
-logger = logging.getLogger("Loader")
+logger = logging.getLogger("larissa.Loader")
 
 class Loader(object):
 
