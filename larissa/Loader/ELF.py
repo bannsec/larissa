@@ -120,7 +120,44 @@ class ELF(Loader):
         assert arch in ["x86","x64"]
         return arch
 
+    @property
+    def symbols(self):
+        """Returns dictionary of symbols discovered in this binary."""
+        
+        symbols = {}
+
+        for section in self.elffile.iter_sections():
+
+            # Only care about the Symbol Tables
+            if type(section) is not SymbolTableSection:
+                continue
+
+            # Iterate through all discovered symbols
+            for symbol in section.iter_symbols():
+
+                # If this symbol is a section name, look it up
+                if symbol['st_name'] == 0:
+
+                    # Skipping undefined symbols
+                    #if symbol['st_shndx'] == "SHN_UNDEF":
+                    if type(symbol['st_shndx']) is str:
+                        continue
+
+                    symsec = self.get_section(symbol['st_shndx'])
+                    symbol_name = symsec.name
+
+                else:
+                    symbol_name = symbol.name
+
+                # Add it to the dict
+                symbols[symbol_name] = symbol
+
+        return symbols
+            
+
 
 from elftools.elf.elffile import ELFFile
+from elftools.elf.sections import SymbolTableSection
 from larissa.Project import Project
 import triton
+
