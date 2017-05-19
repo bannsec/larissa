@@ -123,9 +123,28 @@ class ELF(Loader):
     @property
     def symbols(self):
         """Returns dictionary of symbols discovered in this binary."""
+
+        # Caching results
+        if hasattr(self,"_ELF__symbols"):
+            return self.__symbols
+
+        def symbol_resolve(self,symbol):
+            # If this symbol is a section name, look it up
+            if symbol['st_name'] == 0:
+
+                # Skipping undefined symbols
+                if type(symbol['st_shndx']) is str:
+                    return None
+
+                symsec = self.get_section(symbol['st_shndx'])
+                return symsec.name
+
+            else:
+                return symbol.name
         
         symbols = {}
 
+        # Populate the symbols themselves
         for section in self.elffile.iter_sections():
 
             # Only care about the Symbol Tables
@@ -135,22 +154,54 @@ class ELF(Loader):
             # Iterate through all discovered symbols
             for symbol in section.iter_symbols():
 
-                # If this symbol is a section name, look it up
-                if symbol['st_name'] == 0:
+                symbol_name = symbol_resolve(self, symbol)
 
-                    # Skipping undefined symbols
-                    #if symbol['st_shndx'] == "SHN_UNDEF":
-                    if type(symbol['st_shndx']) is str:
-                        continue
-
-                    symsec = self.get_section(symbol['st_shndx'])
-                    symbol_name = symsec.name
-
-                else:
-                    symbol_name = symbol.name
+                # If lookup failed
+                if symbol_name is None:
+                    continue
+                
+                # Create a symbol object
+                symbol_obj = Symbol()
+                symbol_obj.name = symbol_name
+                symbol_obj.elf = symbol
+                symbol_obj.addr = symbol['st_value'] if symbol['st_value'] is not 0 else None
 
                 # Add it to the dict
-                symbols[symbol_name] = symbol
+                symbols[symbol_name] = symbol_obj
+
+        # Iterate through relocations to give symbols addresses if possible
+        for section in self.elffile.iter_sections():
+
+            # Looking at relocations
+            if type(section) is not RelocationSection:
+                continue
+
+            symtable = self.elffile.get_section(section['sh_link'])
+
+            # Loop through this relocation section
+            for rel in section.iter_relocations():
+
+                # What's the symbol
+                symbol = symtable.get_symbol(rel['r_info_sym'])
+
+                # Resolve it
+                symbol_name = symbol_resolve(self, symbol)
+
+                # If lookup failed
+                if symbol_name is None:
+                    continue
+
+                # Sanity check
+                if symbols[symbol_name].addr is not None:
+                    logger.info("Found symbol {2} already. Old = {0}, New = {1} ... Ignoring and leaving old in place.".format(symbols[symbol_name].addr, rel['r_offset'], symbol_name))
+                    continue
+
+                # Add known address
+                symbols[symbol_name].addr = rel['r_offset']
+
+        
+        # Cache our work
+        self.__symbols = symbols
 
         return symbols
             
@@ -158,6 +209,8 @@ class ELF(Loader):
 
 from elftools.elf.elffile import ELFFile
 from elftools.elf.sections import SymbolTableSection
+from elftools.elf.relocation import RelocationSection
 from larissa.Project import Project
+from larissa.Loader.Symbol import Symbol
 import triton
 
