@@ -79,7 +79,7 @@ class Loader(object):
             # TODO: Support PE
 
     def __repr__(self):
-        return "<Loader arch='{0}' bits={1} endianness={2}>".format(self.main_bin.arch, self.main_bin.bits, self.main_bin.endianness)
+        return "<Loader arch={0} bits={1} endianness={2}>".format(self.main_bin.arch, self.main_bin.bits, self.main_bin.endianness)
 
 
     ##############
