@@ -98,6 +98,14 @@ class ELF(Loader):
     ##############
 
     @property
+    def endianness(self):
+        """Returns either 'little' or 'big'."""
+        if self.elffile.little_endian:
+            return "little"
+
+        return "big"
+
+    @property
     def elffile(self):
         """pyelftools elf file object."""
         return self.__elffile
@@ -169,6 +177,7 @@ class ELF(Loader):
                 # Add it to the dict
                 symbols[symbol_name] = symbol_obj
 
+        """
         # Iterate through relocations to give symbols addresses if possible
         for section in self.elffile.iter_sections():
 
@@ -198,7 +207,7 @@ class ELF(Loader):
 
                 # Add known address
                 symbols[symbol_name].addr = rel['r_offset']
-
+        """
         
         # Cache our work
         self.__symbols = symbols
