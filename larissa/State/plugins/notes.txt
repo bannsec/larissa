@@ -1,0 +1,5 @@
+Plugins will be auto loaded into a new state. Any .py file in plugins folder will be assumed to be a valid plugin and attempted to be auto-loaded. They must follow the following form:
+
+ - Create a class inside the py file with the same name as the file, except capitalized first letter
+ - __init__ must accept a state object and save as self.state (this is property handled at base class)
+ - subclass PluginBase class
