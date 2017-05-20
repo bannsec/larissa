@@ -159,6 +159,11 @@ class ELF(Loader):
     ##############
 
     @property
+    def entry(self):
+        """The entry point of this file. Not-adjusted for any base changes."""
+        return self.elffile['e_entry']
+
+    @property
     def filename(self):
         return self.__filename
 
