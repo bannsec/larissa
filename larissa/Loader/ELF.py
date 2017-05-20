@@ -87,7 +87,7 @@ class ELF(Loader):
         return elf
         
 
-    def get_section(self, section):
+    def section(self, section):
         """Returns the section object for the given section name or number or None if not found."""
 
         if type(section) is str:
@@ -98,6 +98,29 @@ class ELF(Loader):
 
         else:
             raise Exception("Unknown section type of {0}".format(type(section)))
+
+
+    def dynamic_by_tag(self, tag):
+        """dynamic_by_tag(tag) -> tag
+
+        Arguments:
+            tag(str): Named ``DT_XXX`` tag (e.g. ``'DT_STRTAB'``).
+
+        Returns:
+            :class:`elftools.elf.dynamic.DynamicTag`
+        """
+        dt      = None
+        dynamic = self.elffile.get_section_by_name('.dynamic')
+
+        if not dynamic:
+            return None
+
+        try:
+            dt = next(t for t in dynamic.iter_tags() if tag == t.entry.d_tag)
+        except StopIteration:
+            pass
+
+        return dt
 
 
     ##############
@@ -178,7 +201,7 @@ class ELF(Loader):
                 if type(symbol['st_shndx']) is str:
                     return None
 
-                symsec = self.get_section(symbol['st_shndx'])
+                symsec = self.section(symbol['st_shndx'])
                 return symsec.name
 
             else:
@@ -219,7 +242,7 @@ class ELF(Loader):
             if type(section) is not RelocationSection:
                 continue
 
-            symtable = self.elffile.get_section(section['sh_link'])
+            symtable = self.elffile.section(section['sh_link'])
 
             # Loop through this relocation section
             for rel in section.iter_relocations():
