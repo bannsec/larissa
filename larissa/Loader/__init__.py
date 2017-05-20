@@ -4,9 +4,17 @@ logger = logging.getLogger("larissa.Loader")
 class Loader(object):
 
     def __init__(self, project):
+
+        self.shared_objects = OrderedDict()
+
         self.project = project
         self.file = open(self.project.filename,"rb")
         
+        self._load_all_bins()
+
+    def _load_all_bins(self):
+        """Load all the bins! Start with the initial main binary. Then load all the deps."""
+
         # Try to load the main binary
         self.main_bin = self._load_bin(self.project.filename)
 
@@ -14,6 +22,19 @@ class Loader(object):
         if self.main_bin == None:
             logger.error("Something went wrong. Unable to load specified file.")
             return
+
+        # Now try to load the deps
+        for name in self.main_bin.shared_objects:
+            
+            path = self.main_bin.shared_objects[name]
+
+            # If we couldn't find the dll, note it and move on
+            if path == None:
+                logger.warn("Could not find shared object for {0}".format(name))
+                continue
+
+            # Load it
+            self.shared_objects[name] = self._load_bin(path)
 
 
     def _load_bin(self, path):
@@ -29,7 +50,7 @@ class Loader(object):
             try:
                 self.elffile = ELFFile(self.file)
                 del self.elffile
-                return larissa.Loader.ELF.ELF(self.project)
+                return larissa.Loader.ELF.ELF(self.project, filename=path)
 
             except ELFError:
                 logger.error("Unknown or unsupported file type.")
@@ -65,6 +86,7 @@ class Loader(object):
 
         self.__file = f
 
+from collections import OrderedDict
 
 from elftools.elf.elffile import ELFFile
 from elftools.elf.elffile import ELFError

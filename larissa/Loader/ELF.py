@@ -6,10 +6,16 @@ from larissa.Loader import Loader
 class ELF(Loader):
     """Abstract loading an ELF object."""
 
-    def __init__(self, project):
+    def __init__(self, project, filename=None):
+        """
+        project = larissa.Project
+        filename = string path to file to load (default: filename of the loaded project
+        """
+
         self.project = project
 
-        self.file = open(self.project.filename,"rb")
+        self.filename = filename or self.project.filename
+        self.file = open(self.filename,"rb")
         self.elffile = ELFFile(self.file)
 
         # Image Base
@@ -163,6 +169,20 @@ class ELF(Loader):
     ##############
     # Properties #
     ##############
+
+    @property
+    def filename(self):
+        return self.__filename
+
+    @filename.setter
+    def filename(self, filename):
+        if type(filename) is not str:
+            raise Exception("Attempting to set filename from invalid type of {0}".format(type(filename)))
+
+        if not os.path.isfile(filename):
+            raise Exception("File '{0}' not found.".format(filename))
+
+        self.__filename = filename
 
     @property
     def bits(self):
