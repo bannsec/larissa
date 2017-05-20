@@ -13,7 +13,11 @@ class ELF(Loader):
         self.elffile = ELFFile(self.file)
 
         # Image Base
-        self.address = next(seg for seg in self.segments if seg['p_type'] == "PT_LOAD")['p_vaddr']
+        try:
+            self.address = next(seg for seg in self.segments if seg['p_type'] == "PT_LOAD")['p_vaddr']
+        except StopIteration:
+            self.address = None
+
         
     def initialize(self, state):
         """Return an init triton object for the relevant architecture."""
@@ -101,13 +105,23 @@ class ELF(Loader):
     ##############
 
     @property
+    def type(self):
+        """Binary type (for example: "ET_EXEC")"""
+        return self.elffile['e_type']
+
+    @property
+    def type_desc(self):
+        """String description of the type of binary. i.e.: 'EXEC (Executable file)'"""
+        return describe_e_type(self.type)
+
+    @property
     def address(self):
         """The base address of this loaded elf."""
         return self.__address
 
     @address.setter
     def address(self, address):
-        if type(address) is not int:
+        if type(address) not in [int, type(None)]:
             raise Exception("Invalid type for address of {0}".format(type(address)))
 
         self.__address = address
@@ -239,6 +253,7 @@ class ELF(Loader):
 from elftools.elf.elffile import ELFFile
 from elftools.elf.sections import SymbolTableSection
 from elftools.elf.relocation import RelocationSection
+from elftools.elf.descriptions import describe_e_type
 from larissa.Project import Project
 from larissa.Loader.Symbol import Symbol
 import triton
