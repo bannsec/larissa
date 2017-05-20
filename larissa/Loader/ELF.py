@@ -130,14 +130,55 @@ class ELF(Loader):
 
         return (t for t in dynamic.iter_tags() if tag == t.entry.d_tag)
 
+    def find_library(self, library):
+        """Takes in string name of library and attempts to resolve the location on the current machine."""
+
+        # TODO: Probably a better way to do all this...
+
+        # Implement RPATH and RUNPATH: https://en.wikipedia.org/wiki/Rpath
+        ld = subprocess.check_output(["ldconfig","-p"]).split("\n")
+
+        paths = [os.path.realpath(path.split("=> ")[1]) for path in ld if path.endswith("/" + library)]
+
+        # Try them one at a time until we get one that looks to be a winner
+        for path in paths:
+
+            with open(path,"rb") as f:
+
+                elffile = ELFFile(f)
+                
+                # Check that arch, bits, and endian match up
+                if elffile.get_machine_arch() == self.elffile.get_machine_arch() and \
+                elffile.elfclass == self.elffile.elfclass and \
+                elffile.little_endian == self.elffile.little_endian:
+
+                    # Found it
+                    del elffile
+                    return path
+
+        return None
+
     ##############
     # Properties #
     ##############
 
     @property
+    def bits(self):
+        """How many bits is this elf file? integer, i.e.: 32, 64"""
+        return self.elffile.elfclass
+
+    @property
     def shared_objects(self):
-        """Returns a list of shared objects this object relies on."""
-        return [obj.needed for obj in self.dynamic_by_tag_iter("DT_NEEDED")]
+        """Returns an ordered dictionary of shared objects this object relies on."""
+
+        # Order can be important when loading objects
+        objects = OrderedDict()
+
+        # Find them and add them in order
+        for obj in self.dynamic_by_tag_iter("DT_NEEDED"):
+            objects[obj.needed] = self.find_library(obj.needed)
+
+        return objects
 
     @property
     def type(self):
@@ -292,4 +333,7 @@ from elftools.elf.descriptions import describe_e_type
 from larissa.Project import Project
 from larissa.Loader.Symbol import Symbol
 import triton
+import subprocess
+import os
+from collections import OrderedDict
 
