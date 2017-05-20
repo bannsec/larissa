@@ -5,7 +5,7 @@ class State(object):
         self.project = project
         
         # Init the state
-        self.binary = self.project.loader.main_bin.initialize(None)
+        self.binary = self.project.loader.main_bin.map_sections(None)
 
     ##############
     # Properties #
