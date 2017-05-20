@@ -151,6 +151,11 @@ class ELF(Loader):
 
         return None
 
+    def symbol(self, symbol):
+        """Retrieve the given symbol. Basically the same as "symbols[symbol]" """
+        return self.symbols[symbol] if symbol in self.symbols else None
+
+
     def __repr__(self):
         return "<ELF filename='{0}'>".format(self.filename)
 
