@@ -42,6 +42,7 @@ class Loader(object):
             logger.error("Something went wrong. Unable to load specified file.")
             return
 
+        # TODO: Be sure to check the deps of the deps... Maybe make this recursive?
         # Now try to load the deps
         for name in self.main_bin.shared_objects:
             
@@ -76,6 +77,9 @@ class Loader(object):
                 return None
 
             # TODO: Support PE
+
+    def __repr__(self):
+        return "<Loader arch='{0}' bits={1} endianness={2}>".format(self.main_bin.arch, self.main_bin.bits, self.main_bin.endianness)
 
 
     ##############

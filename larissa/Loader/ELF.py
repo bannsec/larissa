@@ -151,6 +151,9 @@ class ELF(Loader):
 
         return None
 
+    def __repr__(self):
+        return "<ELF filename='{0}'>".format(self.filename)
+
     ##############
     # Properties #
     ##############
