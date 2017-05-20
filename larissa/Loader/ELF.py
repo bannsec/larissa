@@ -135,6 +135,11 @@ class ELF(Loader):
     ##############
 
     @property
+    def shared_objects(self):
+        """Returns a list of shared objects this object relies on."""
+        return [obj.needed for obj in self.dynamic_by_tag_iter("DT_NEEDED")]
+
+    @property
     def type(self):
         """Binary type (for example: "ET_EXEC")"""
         return self.elffile['e_type']
