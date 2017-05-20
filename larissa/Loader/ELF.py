@@ -11,6 +11,9 @@ class ELF(Loader):
 
         self.file = open(self.project.filename,"rb")
         self.elffile = ELFFile(self.file)
+
+        # Image Base
+        self.address = next(seg for seg in self.segments if seg['p_type'] == "PT_LOAD")['p_vaddr']
         
     def initialize(self, state):
         """Return an init triton object for the relevant architecture."""
@@ -97,6 +100,18 @@ class ELF(Loader):
     # Properties #
     ##############
 
+    @property
+    def address(self):
+        """The base address of this loaded elf."""
+        return self.__address
+
+    @address.setter
+    def address(self, address):
+        if type(address) is not int:
+            raise Exception("Invalid type for address of {0}".format(type(address)))
+
+        self.__address = address
+    
     @property
     def endianness(self):
         """Returns either 'little' or 'big'."""
