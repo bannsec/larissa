@@ -6,20 +6,36 @@ class Loader(object):
     def __init__(self, project):
         self.project = project
         self.file = open(self.project.filename,"rb")
-        self._load_main_bin()
+        
+        # Try to load the main binary
+        self.main_bin = self._load_bin(self.project.filename)
 
-    def _load_main_bin(self):
-        """Attempt to determine file type and load sub-class appropriately."""
-
-        # Is it an ELF?
-        try:
-            self.elffile = ELFFile(self.file)
-            del self.elffile
-            self.main_bin = larissa.Loader.ELF.ELF(self.project)
-
-        except ELFError:
-            logger.error("Unknown or unsupported file type.")
+        # Sanity check
+        if self.main_bin == None:
+            logger.error("Something went wrong. Unable to load specified file.")
             return
+
+
+    def _load_bin(self, path):
+        """Attempt to determine file type and load sub-class appropriately.
+            NOTE: This does NOT initialize any memory. Simply loads the object.
+            
+            Returns larissa object if successful, or None otherwise.
+        """
+
+        with open(path, "rb") as f:
+
+            # Is it an ELF?
+            try:
+                self.elffile = ELFFile(self.file)
+                del self.elffile
+                return larissa.Loader.ELF.ELF(self.project)
+
+            except ELFError:
+                logger.error("Unknown or unsupported file type.")
+                return None
+
+            # TODO: Support PE
 
 
     ##############
@@ -48,7 +64,6 @@ class Loader(object):
             raise Exception("Invalid file property of type {0}".format(type(f)))
 
         self.__file = f
-
 
 
 from elftools.elf.elffile import ELFFile
