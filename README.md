@@ -13,7 +13,22 @@ Installation has only been tested into a virtual environment.
 ```bash
 $ virtualenv larissa
 $ source larissa/bin/activate
+```
+
+## Pypi Install
+Installing from pypi (i.e.: "normal" pip install) is:
+
+```bash
 (larissa)$ pip install larissa
+```
+
+## Repo install
+If you want to install from the repo, you will need to clone it. Given larissa's current reliance on submodules, you will want to recursively clone it.
+
+```bash
+(larissa)$ git clone --recursive https://github.com/Owlz/larissa.git
+(larissa)$ cd larissa
+(larissa)$ pip install .
 ```
 
 Be patient. This installer will compile z3 as well as triton. This will take a little while.
