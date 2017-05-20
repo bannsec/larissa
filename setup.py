@@ -29,7 +29,7 @@ def _install_z3():
 
 def _install_capstone():
     # Triton needs the deps that the wheel file doesn't have
-    os.system("pip install --no-binary :all: capstone")
+    os.system("pip install capstone==3.0.5-rc2")
 
 def _install_triton():
     # Using triton version included in larissa due to triton not being in pypi
