@@ -115,6 +115,11 @@ class ELF(Loader):
         self.__elffile = elffile
 
     @property
+    def segments(self):
+        """Returns generator of segment information."""
+        return self.elffile.iter_segments()
+
+    @property
     def sections(self):
         """Returns generator of section information."""
 
