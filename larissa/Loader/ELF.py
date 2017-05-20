@@ -30,21 +30,6 @@ class ELF(Loader):
 
         # TODO: Triton works on a global state right now... Update this once Triton gives actual contexts to work with
 
-        # TODO: Call this smartly basied on if it's ELF or PE
-
-        if self.arch in ["x86", "x64"]:
-            if self.bits == 32:
-                triton.setArchitecture(triton.ARCH.X86)
-
-            elif self.bits == 64:
-                triton.setArchitecture(triton.ARCH.X86_64)
-
-            else:
-                raise Exception("Unknown bits size of {0}".format(self.bits))
-
-        else:
-            raise Exception("Unknown architecture of {0}".format(self.arch))
-
         # Define symbolic optimizations
         triton.enableMode(triton.MODE.ALIGNED_MEMORY, False) # TODO: Apparently True is faster? Makes memory access irritating though...
         triton.enableMode(triton.MODE.ONLY_ON_SYMBOLIZED, True)

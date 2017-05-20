@@ -12,6 +12,25 @@ class Loader(object):
         
         self._load_all_bins()
 
+        self._set_triton_arch()
+
+    def _set_triton_arch(self):
+        """Triton needs to know what arch it's dealing with. Figure it out and set it."""
+
+        if self.main_bin.arch in ["x86", "x64"]:
+            if self.main_bin.bits == 32:
+                triton.setArchitecture(triton.ARCH.X86)
+
+            elif self.main_bin.bits == 64:
+                triton.setArchitecture(triton.ARCH.X86_64)
+
+            else:
+                raise Exception("Unknown bits size of {0}".format(self.main_bin.bits))
+
+        else:
+            raise Exception("Unknown architecture of {0}".format(self.main_bin.arch))
+
+
     def _load_all_bins(self):
         """Load all the bins! Start with the initial main binary. Then load all the deps."""
 
@@ -92,3 +111,5 @@ from elftools.elf.elffile import ELFFile
 from elftools.elf.elffile import ELFError
 from larissa.Project import Project
 import larissa.Loader.ELF
+
+import triton
