@@ -175,7 +175,7 @@ class ELF(Loader):
         if not os.path.isfile(filename):
             raise Exception("File '{0}' not found.".format(filename))
 
-        self.__filename = filename
+        self.__filename = os.path.abspath(filename)
 
     @property
     def bits(self):
@@ -298,6 +298,7 @@ class ELF(Loader):
                 symbol_obj.name = symbol_name
                 symbol_obj.elf = symbol
                 symbol_obj.addr = symbol['st_value'] if symbol['st_value'] is not 0 else None
+                symbol_obj.source = os.path.basename(self.filename)
 
                 # Add it to the dict
                 symbols[symbol_name] = symbol_obj

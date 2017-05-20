@@ -13,6 +13,18 @@ class Symbol(object):
     ##############
 
     @property
+    def source(self):
+        """String reprenstation of file name that this symbol is from. For instance "libc.so.6"."""
+        return self.__source
+
+    @source.setter
+    def source(self, source):
+        if type(source) not in [str, unicode]:
+            raise Exception("Invalid type for source of {0}".format(type(source)))
+
+        self.__source = source
+
+    @property
     def name(self):
         """Unicode representation of the symbol's name."""
         return self.__name
