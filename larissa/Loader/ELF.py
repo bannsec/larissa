@@ -110,18 +110,25 @@ class ELF(Loader):
             :class:`elftools.elf.dynamic.DynamicTag`
         """
         dt      = None
+
+        try:
+            dt = next(self.dynamic_by_tag_iter(tag))
+
+        except StopIteration, TypeError:
+            pass
+
+        return dt
+
+    def dynamic_by_tag_iter(self, tag):
+        """Same as dynamic_by_tag except return generator for tags"""
+
+        dt      = None
         dynamic = self.elffile.get_section_by_name('.dynamic')
 
         if not dynamic:
             return None
 
-        try:
-            dt = next(t for t in dynamic.iter_tags() if tag == t.entry.d_tag)
-        except StopIteration:
-            pass
-
-        return dt
-
+        return (t for t in dynamic.iter_tags() if tag == t.entry.d_tag)
 
     ##############
     # Properties #
