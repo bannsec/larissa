@@ -78,6 +78,32 @@ class Loader(object):
 
             # TODO: Support PE
 
+    def symbol(self, symbol, first=None):
+        """Input symbol string to resolve. Return first resolution of symbol as larissa class object.
+
+        first == optional string argument of library name to lookup symbols in first. This is for objects loaded with DF_SYMBOLIC. If not given, normal loading preference is used.
+        
+        Returns None if the symbol could not be resolved."""
+
+        # Check for first
+        if first is not None:
+            if symbol in self.shared_objects[first].symbols and self.shared_objects[first].symbols[symbol] != None:
+                return self.shared_objects[first].symbols[symbol]
+
+        # Check main object
+        if symbol in self.main_bin.symbols and self.main_bin.symbols[symbol].addr != None:
+            return self.main_bin.symbols[symbol]
+
+        # Check all loaded shared objects
+        for name in self.shared_objects:
+            object = self.shared_objects[name]
+
+            if symbol in object.symbols and object.symbols[symbol].addr != None:
+                return object.symbols[symbol]
+
+        return None
+
+
     def __repr__(self):
         return "<Loader arch={0} bits={1} endianness={2}>".format(self.main_bin.arch, self.main_bin.bits, self.main_bin.endianness)
 
