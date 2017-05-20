@@ -10,10 +10,19 @@ import urllib2
 import tarfile
 from glob import glob
 import multiprocessing
+import re
 
 here = os.path.abspath(os.path.dirname(__file__))
 
 long_description = "See website for more info."
+
+def find_file(file_name):
+    """Locate the given file from our python root."""
+    for root, dirs, files in os.walk(sys.prefix):
+        if file_name in files:
+            return root
+    
+    raise Exception("Cannot find file {0}".format(file_name))
 
 def _install_z3():
     # Need to build this.
@@ -32,13 +41,21 @@ def _install_capstone():
     os.system("pip install capstone==3.0.5-rc2")
 
 def _install_triton():
+    # Locate the needed libraries
+    capstone_include = re.match("(.*)/capstone$", find_file("capstone.h")).group(1)
+    capstone_lib = os.path.join(find_file("libcapstone.so"),"libcapstone.so")
+    z3_paths = find_file("z3++.h")
+    z3_paths += ":" + find_file("z3.h")
+    z3_paths += ":" + find_file("z3_ast_containers.h")
+
+
     # Using triton version included in larissa due to triton not being in pypi
     os.chdir(os.path.join(here,"lib","triton"))
     os.mkdir("build")
     os.chdir("build")
 
-    os.system("cmake -DCMAKE_INSTALL_PREFIX={0} ..".format(sys.prefix))
-    os.system("make -j{0} install".format(multiprocessing.cpu_count()))
+    os.system("cmake -DCMAKE_INSTALL_PREFIX={0} -DCAPSTONE_INCLUDE_DIR={1} -DCAPSTONE_LIBRARY={2} ..".format(sys.prefix, capstone_include, capstone_lib))
+    os.system("CPATH={1} make -j{0} install".format(multiprocessing.cpu_count(), z3_paths))
 
     os.chdir(here)
 
