@@ -157,11 +157,21 @@ class ELF(Loader):
 
 
     def __repr__(self):
-        return "<ELF filename='{0}'>".format(self.filename)
+        return "<ELF filename='{0}' abi='{1}'>".format(self.filename, self.abi_desc)
 
     ##############
     # Properties #
     ##############
+
+    @property
+    def abi(self):
+        """What ABI to use? For instance, SYSV, NetBSD, etc."""
+        return self.elffile['e_ident']['EI_OSABI']
+
+    @property
+    def abi_desc(self):
+        """Human readable ABI Description."""
+        return describe_ei_osabi(self.abi)
 
     @property
     def entry(self):
@@ -351,6 +361,7 @@ from elftools.elf.elffile import ELFFile
 from elftools.elf.sections import SymbolTableSection
 from elftools.elf.relocation import RelocationSection
 from elftools.elf.descriptions import describe_e_type
+from elftools.elf.descriptions import describe_ei_osabi
 from larissa.Project import Project
 from larissa.Loader.Symbol import Symbol
 import triton
