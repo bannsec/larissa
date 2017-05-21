@@ -1,0 +1,17 @@
+
+# Grabbing from valgrind headers
+# /usr/include/valgrind/vki/vki-scnums-x86-linux.h
+
+with open("<header with defines only>","r") as f:
+    data = f.read()
+
+syscalls = {}
+
+for d in data:
+    if d == "" or "define" not in d or r"(__NR_" in d:
+        continue
+    d = d.replace("#define __NR_","")
+    print(d)
+    syscall, number = re.findall(r"([a-zA-Z0-9\_]+)[ \t]+([0-9]+)",d)[0]
+    syscalls[int(number)] = syscall
+

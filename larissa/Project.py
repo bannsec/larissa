@@ -10,6 +10,8 @@ class Project(object):
         self.factory = Factory(self)
         self.loader = Loader(self)
 
+        self.simprocedures = SimProcedures(self)
+
     def __repr__(self):
         return "<Project filename={0}>".format(self.filename)
 
@@ -56,3 +58,4 @@ class Project(object):
 import os
 from larissa.Factory import Factory
 from larissa.Loader import Loader
+from .SimProcedures import SimProcedures
