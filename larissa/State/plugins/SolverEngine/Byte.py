@@ -34,6 +34,21 @@ class Byte(object):
 
         return "<{0}>".format(" ".join(attrib for attrib in attribs))
 
+    def __str__(self):
+
+        # No value?
+        if self.value is None:
+            logger.error("No value to make into str.")
+            return ""
+
+        # Symbolic
+        if not self.concrete:
+            logger.error("Cannot handle symbolic byte yet.")
+            return ""
+
+        # Concrete
+        return chr(self.value)
+
     ##############
     # Properties #
     ##############
