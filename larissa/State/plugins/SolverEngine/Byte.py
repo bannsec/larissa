@@ -20,7 +20,9 @@ class Byte(object):
 
         # Check if this is a symbolic value or not
         if self.address in triton.getSymbolicMemory():
-            self.value = triton.getSymbolicMemory()[self.address].getAst()
+            # TODO: Not clear yet what i should be storing... AST? FullAST? Expression? Variable?
+            # Storing Full Ast For Now
+            self.value = triton.getFullAst(triton.getSymbolicMemory()[self.address].getAst())
 
         else:
             # Concrete memory
@@ -43,8 +45,11 @@ class Byte(object):
 
         # Symbolic
         if not self.concrete:
-            logger.error("Cannot handle symbolic byte yet.")
-            return ""
+            logger.error("Cannot handle symbolic byte yet. Attempting to resolve anyway...")
+            # TODO: Secretly try to evaluate anyway. Not sure if this is correct functionality atm.
+            # TODO: This likely won't take some constraints into consideration....
+            #       Likely want to switch this for a state.se.any_str type call once i have that figured out.
+            return chr(self.value.evaluate())
 
         # Concrete
         return chr(self.value)
