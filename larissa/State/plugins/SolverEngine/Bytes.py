@@ -33,6 +33,10 @@ class Bytes(object):
         # Iterate over our bytes
         return self.bytes.__iter__()
 
+    def __getitem__(self,item):
+        # Pass through to list objefct
+        return self.bytes[item]
+
     ##############
     # Properties #
     ##############
