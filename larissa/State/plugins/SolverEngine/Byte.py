@@ -29,7 +29,7 @@ class Byte(object):
     def __repr__(self):
         attribs = ["Byte"]
 
-        if self.value:
+        if self.value is not None:
             attribs.append("value={0}".format(self.value))
 
         return "<{0}>".format(" ".join(attrib for attrib in attribs))
