@@ -29,6 +29,10 @@ class Bytes(object):
 
         return "<{0}>".format(' '.join(attribs))
 
+    def __iter__(self):
+        # Iterate over our bytes
+        return self.bytes.__iter__()
+
     ##############
     # Properties #
     ##############
