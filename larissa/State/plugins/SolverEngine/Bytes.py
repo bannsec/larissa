@@ -34,7 +34,9 @@ class Bytes(object):
         return self.bytes.__iter__()
 
     def __getitem__(self,item):
-        # Pass through to list objefct
+        # TODO: Maybe return index slice as a Bytes object?
+
+        # Pass through to list object
         return self.bytes[item]
 
     def __str__(self):

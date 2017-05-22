@@ -20,11 +20,11 @@ class Byte(object):
 
         # Check if this is a symbolic value or not
         if self.address in triton.getSymbolicMemory():
-            logger.error("Not handling symbolic memory yet.")
-            return
+            self.value = triton.getSymbolicMemory()[self.address].getAst()
 
-        # Concrete memory
-        self.value = triton.getConcreteMemoryValue(triton.MemoryAccess(self.address,1))
+        else:
+            # Concrete memory
+            self.value = triton.getConcreteMemoryValue(triton.MemoryAccess(self.address,1))
 
     def __repr__(self):
         attribs = ["Byte"]
@@ -65,7 +65,7 @@ class Byte(object):
 
     @value.setter
     def value(self, value):
-        if type(value) not in [int, long, type(None)]:
+        if type(value) not in [int, long, type(None), Ast]:
             logger.error("Unhandled Byte value of type {0}".format(type(value)))
             return
 
@@ -103,3 +103,6 @@ class Byte(object):
 
 from larissa.State import State
 import triton
+
+# Hack.. Not sure where Ast type is directly defined.
+Ast = type(triton.ast.bv(1,1))
