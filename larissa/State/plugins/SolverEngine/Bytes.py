@@ -37,6 +37,10 @@ class Bytes(object):
         # Pass through to list objefct
         return self.bytes[item]
 
+    def __str__(self):
+        """Return string representation of bytes object. If any bytes are symbolic, a single possibility will be returned for that byte."""
+        return "".join(str(byte) for byte in self)
+
     ##############
     # Properties #
     ##############
