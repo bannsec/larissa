@@ -1,0 +1,9 @@
+Check that project is being passed, not copied
+   - hash(project) == hash(state.project)
+
+Once state splitting, verify proper split
+ - s2 = state.copy()
+  - s2.posix.blerg = 12
+  - assert s2.posix.blerg != state.posix.blerg
+ - asset hash(s2) != hash(state)
+ - etc
