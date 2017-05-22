@@ -6,6 +6,10 @@ class SolverEngine(PluginBase):
 
         self.state = state
 
+    def Byte(self, *args, **kwargs):
+        """Instantiate a Byte object for the current state."""
+        return Byte(self.state, *args, **kwargs)
+
     def __repr__(self):
         return "<SolverEngine>"
 
@@ -13,3 +17,4 @@ class SolverEngine(PluginBase):
     # Properties #
     ##############
 
+from .Byte import Byte
