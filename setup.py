@@ -74,7 +74,7 @@ class CustomInstallCommand(install):
 
 setup(
     name='larissa',
-    version='0.0.3',
+    version='0.0.4',
     description='Tool to automate working with Triton',
     long_description=long_description,
     url='https://github.com/owlz/larissa',
