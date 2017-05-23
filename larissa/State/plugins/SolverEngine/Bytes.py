@@ -43,6 +43,25 @@ class Bytes(object):
         """Return string representation of bytes object. If any bytes are symbolic, a single possibility will be returned for that byte."""
         return "".join(str(byte) for byte in self)
 
+    def __len__(self):
+        return len(self.bytes)
+
+    def __int__(self):
+
+        # Correct for architecture endianness
+        if self.state.project.loader.main_bin.endianness != 'little':
+            bytes = reversed(self)
+        else:
+            bytes = self
+
+        out = 0
+
+        for i, byte in enumerate(bytes):
+            out += int(byte) << (i*8)
+
+        return out
+
+
     ##############
     # Properties #
     ##############

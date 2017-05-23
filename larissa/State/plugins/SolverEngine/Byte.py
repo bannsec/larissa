@@ -54,6 +54,24 @@ class Byte(object):
         # Concrete
         return chr(self.value)
 
+    def __int__(self):
+        # No value?
+        if self.value is None:
+            logger.error("No value to make into int.")
+            return -1
+
+        # Symbolic
+        if not self.concrete:
+            logger.error("Cannot handle symbolic byte yet. Attempting to resolve anyway...")
+            # TODO: Secretly try to evaluate anyway. Not sure if this is correct functionality atm.
+            # TODO: This likely won't take some constraints into consideration....
+            #       Likely want to switch this for a state.se.any_str type call once i have that figured out.
+            return int(self.value.evaluate())
+
+        # Concrete
+        return int(self.value)
+        
+
     ##############
     # Properties #
     ##############
