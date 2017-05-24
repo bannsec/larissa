@@ -28,20 +28,55 @@ def find_file(file_name):
 def _get_boost_path():
     # Is it installed at the system level?
     if os.path.isdir("/usr/include/boost"):
-        return "/usr/include"
+        # Is it new enough?
+        if _is_boost_new_enough("/usr/include"):
+            return "/usr/include"
 
     # Is it already installed in the virtualenv?
     if os.path.isdir(os.path.join(sys.prefix, "include", "boost")):
-        return sys.prefix
+        # Is it new enough?
+        if _is_boost_new_enough(os.path.join(sys.prefix,"include")):
+            return sys.prefix
 
     return None
+
+def _get_boost_version(boost_path):
+    # Assuming the path exists here
+    # Return (major, minor, patch)
+
+    with open(os.path.join(boost_path,"boost","version.hpp"),"r") as f:
+        data = f.read()
+
+    version = int(re.findall("#define +BOOST_VERSION +([0-9]+)",data)[0])
+
+    return version / 100000, version / 100 % 1000, version % 100
+
+def _is_boost_new_enough(boost_path):
+    # Caveat, it has to be a high enough version...
+    major, minor, patch = _get_boost_version(boost_path)
+
+    if major > 1:
+        return True
+
+    if major == 1 and minor >= 55:
+        return True
+
+    return False
 
 def _install_boost():
     """Determine if we need to install liboost, and do so."""
 
     # If it's already installed, don't install it.
     if _get_boost_path() != None:
-        return
+
+        # Caveat, it has to be a high enough version...
+        major, minor, patch = _get_boost_version()
+
+        if major > 1:
+            return
+
+        if major == 1 and minor >= 55:
+            return
 
     # Looks like we need to build it
     try:
