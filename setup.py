@@ -131,9 +131,9 @@ def _install_triton():
     # Locate the needed libraries
     capstone_include = re.match("(.*)/capstone$", find_file("capstone.h")).group(1)
     capstone_lib = os.path.join(find_file("libcapstone.so"),"libcapstone.so")
-    z3_paths = find_file("z3++.h")
-    z3_paths += ":" + find_file("z3.h")
-    z3_paths += ":" + find_file("z3_ast_containers.h")
+    cpath = [find_file("z3++.h")]
+    cpath.append(find_file("z3.h"))
+    cpath.append(find_file("z3_ast_containers.h"))
 
 
     # Using triton version included in larissa due to triton not being in pypi
@@ -152,13 +152,15 @@ def _install_triton():
         cmake_options.append("-DBoost_INCLUDE_DIR={0}".format(os.path.join(_get_boost_path(),"include")))
         cmake_options.append("-DBoost_LIBRARY_DIR={0}".format(os.path.join(_get_boost_path(),"lib")))
 
+        cpath.append(_get_boost_path())
+
     try:
         subprocess.check_output("cmake {0} ..".format(' '.join(cmake_options)),shell=True)
     except Exception as e:
         raise Exception(e.output)
     
     try:
-        subprocess.check_output("CPATH={1} make -j{0} install".format(multiprocessing.cpu_count(), z3_paths),shell=True)
+        subprocess.check_output("CPATH={1} make -j{0} install".format(multiprocessing.cpu_count(), ':'.join(cpath)),shell=True)
     except Exception as e:
         raise Exception(e.output)
 
