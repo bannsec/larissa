@@ -47,6 +47,13 @@ class Memory(PluginBase):
 
         return self.state.se.Bytes(address=item.start, length=item.stop - item.start)
 
+    def __setitem__(self, key, value):
+        if type(key) not in [int, long]:
+            logger.error("Unhandled key type of {0}".format(type(key)))
+            return
+
+        self.store(key, value)
+
     ############
     # Property #
     ############
