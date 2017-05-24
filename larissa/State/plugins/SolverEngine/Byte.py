@@ -43,16 +43,8 @@ class Byte(object):
             logger.error("No value to make into str.")
             return ""
 
-        # Symbolic
-        if not self.concrete:
-            logger.error("Cannot handle symbolic byte yet. Attempting to resolve anyway...")
-            # TODO: Secretly try to evaluate anyway. Not sure if this is correct functionality atm.
-            # TODO: This likely won't take some constraints into consideration....
-            #       Likely want to switch this for a state.se.any_str type call once i have that figured out.
-            return chr(self.value.evaluate())
 
-        # Concrete
-        return chr(self.value)
+        return self.state.se.any_str(self)
 
     def __int__(self):
         # No value?

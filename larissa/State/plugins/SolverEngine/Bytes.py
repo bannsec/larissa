@@ -41,7 +41,7 @@ class Bytes(object):
 
     def __str__(self):
         """Return string representation of bytes object. If any bytes are symbolic, a single possibility will be returned for that byte."""
-        return "".join(str(byte) for byte in self)
+        return self.state.se.any_str(self)
 
     def __len__(self):
         return len(self.bytes)

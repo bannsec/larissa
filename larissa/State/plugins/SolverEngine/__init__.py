@@ -138,6 +138,55 @@ class SolverEngine(PluginBase):
         
         return [option[whip_id].getValue() for option in triton.getModels(triton.ast.assert_(ast),n)]
 
+    def any_n_str(self, obj, n):
+        """Return a list of n possible strings for this object."""
+        if type(obj) not in [int, long, Byte, Bytes]:
+            logger.error("Invalid type for obj of {0}".format(type(obj)))
+            return
+
+        # Silly
+        if type(obj) in [int, long]:
+            return [chr(obj)]
+
+        # Utilize any_n_int to get the values
+        ints = self.any_n_int(obj, n)
+
+        strs = []
+
+        # Convert
+        for val in ints:
+
+            # int -> hex
+            val = hex(val)[2:].strip("L")
+
+            # make sure hex is padded right
+            if len(val) % 2 != 0:
+                val = "0" + val
+
+            # hex to str
+            val = unhexlify(val)
+
+            # Adjust for endianness
+            if self.state.project.loader.main_bin.endianness == 'little':
+                val = val[::-1]
+
+            strs.append(val)
+
+        return strs
+
+    def any_str(self, obj):
+        """Return one possible string."""
+        if type(obj) not in [int, long, Byte, Bytes]:
+            logger.error("Invalid type for obj of {0}".format(type(obj)))
+            return
+
+        strs = self.any_n_str(obj,1)
+
+        # Couldn't find any
+        if strs == []:
+            return None
+
+        return strs[0]
 
     def _get_whip(self, bits):
         """Return a whip variable of bits size."""
@@ -158,6 +207,7 @@ class SolverEngine(PluginBase):
 from .Byte import Byte
 from .Bytes import Bytes
 import triton
+from binascii import unhexlify
 
 import logging
 logger = logging.getLogger("larissa.State.plugins.SolverEngine")
