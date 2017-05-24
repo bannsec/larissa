@@ -10,6 +10,7 @@ import urllib2
 import tarfile
 from glob import glob
 import multiprocessing
+import subprocess
 import re
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -23,6 +24,31 @@ def find_file(file_name):
             return root
     
     raise Exception("Cannot find file {0}".format(file_name))
+
+def _get_boost_path():
+    # Is it installed at the system level?
+    if os.path.isdir("/usr/include/boost"):
+        return "/usr/include"
+
+    # Is it already installed in the virtualenv?
+    if os.path.isdir(os.path.join(sys.prefix, "include", "boost")):
+        return sys.prefix
+
+    return None
+
+def _install_boost():
+    """Determine if we need to install liboost, and do so."""
+
+    # If it's already installed, don't install it.
+    if _get_boost_path() != None:
+        return
+
+    # Looks like we need to build it
+    try:
+        subprocess.check_output("pip install larissa_boost",shell=True)
+    except Exception as e:
+        raise Exception(e.output)
+
 
 def _install_z3():
     # Need to build this.
@@ -54,8 +80,26 @@ def _install_triton():
     os.mkdir("build")
     os.chdir("build")
 
-    os.system("cmake -DCMAKE_INSTALL_PREFIX={0} -DCAPSTONE_INCLUDE_DIR={1} -DCAPSTONE_LIBRARY={2} ..".format(sys.prefix, capstone_include, capstone_lib))
-    os.system("CPATH={1} make -j{0} install".format(multiprocessing.cpu_count(), z3_paths))
+    cmake_options = [
+            '-DCMAKE_INSTALL_PREFIX={0}'.format(sys.prefix),
+            '-DCAPSTONE_INCLUDE_DIR={0}'.format(capstone_include),
+            '-DCAPSTONE_LIBRARY={0}'.format(capstone_lib)
+            ]
+
+    # Custom boost install dir
+    if _get_boost_path() != "/usr/include":
+        cmake_options.append("-DBoost_INCLUDE_DIR={0}".format(os.path.join(sys.prefix,"include")))
+        cmake_options.append("-DBoost_LIBRARY_DIR={0}".format(os.path.join(sys.prefix,"lib")))
+
+    try:
+        subprocess.check_output("cmake {0} ..".format(' '.join(cmake_options)),shell=True)
+    except Exception as e:
+        raise Exception(e.output)
+    
+    try:
+        subprocess.check_output("CPATH={1} make -j{0} install".format(multiprocessing.cpu_count(), z3_paths),shell=True)
+    except Exception as e:
+        raise Exception(e.output)
 
     os.chdir(here)
 
