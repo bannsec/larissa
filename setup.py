@@ -154,6 +154,7 @@ class CustomInstallCommand(install):
     def run(self):
         # Save off our dir
         cwd = os.getcwd()
+        self.execute(_install_boost, (), msg='Compiling/Installing Boost')
         self.execute(_install_z3, (), msg='Compiling/Installing z3')
         self.execute(_install_capstone, (), msg='Compiling/Installing capstone')
         self.execute(_install_triton, (), msg='Compiling/Installing triton')
