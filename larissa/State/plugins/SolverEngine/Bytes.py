@@ -3,15 +3,31 @@ logger = logging.getLogger("larissa.State.plugins.SolverEngine.Bytes")
 
 class Bytes(object):
 
-    def __init__(self, state, address=None, length=1, *args, **kwargs):
+    def __init__(self, state, address=None, length=1, symbolic = False, *args, **kwargs):
+        """
+        address = address to read bytes from (optional)
+        length = number of bytes to read
+        symbolic = Should it be symbolic? (exclusive from address)
+        """
 
         self.state = state
 
         # Actual list of loaded bytes
         self.bytes = []
 
+        # These two are mutually exclusive for now
+        if address and symbolic:
+            logger.error("Cannot specify both address and symbolic for now.")
+            return
+
         self.length = length
         self.address = address
+
+        if symbolic:
+            for _ in xrange(length):
+                # Just keep adding
+                self.bytes.append(self.state.se.Byte(symbolic=True))
+
 
     def _load_from_memory(self):
         """Loads up our bytes."""
@@ -23,8 +39,13 @@ class Bytes(object):
     def __repr__(self):
         attribs = ["Bytes"]
 
+        if self.symbolic:
+            attribs.append("Symbolic")
+
         if self.address is not None:
             attribs.append("address={0}".format(hex(self.address)))
+
+        if self.length > 0:
             attribs.append("length={0}".format(self.length))
 
         return "<{0}>".format(' '.join(attribs))
@@ -71,6 +92,10 @@ class Bytes(object):
     ##############
     # Properties #
     ##############
+
+    @property
+    def symbolic(self):
+        return not self.concrete
 
     @property
     def concrete(self):
