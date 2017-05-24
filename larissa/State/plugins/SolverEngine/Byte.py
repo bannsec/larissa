@@ -3,14 +3,28 @@ logger = logging.getLogger("larissa.State.plugins.SolverEngine.Byte")
 
 class Byte(object):
     
-    def __init__(self, state, address=None, *args, **kwargs):
+    def __init__(self, state, address=None, symbolic=False, *args, **kwargs):
+        """
+        state = larissa.State object of current state.
+        address = Optional address to load from.
+        symbolic = Should this byte be symbolic.
+        """
 
         self.state = state
 
         self.value = None
 
+        # These two are mutually exclusive for now
+        if address and symbolic:
+            logger.error("Cannot specify both address and symbolic for now.")
+            return
+
         # If address is passed, grab it from triton
         self.address = address
+
+        if symbolic:
+            # Whip up a new variable byte
+            self.value = triton.ast.variable(triton.newSymbolicVariable(8))
 
     def _load_from_memory(self):
         """Look at the current stored address and attempt to load it into this object."""

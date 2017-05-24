@@ -41,13 +41,13 @@ class SolverEngine(PluginBase):
         if type(obj) in [int, long]:
             return [obj]
 
-        # If it's only one, just put it into a list
-        if type(obj) is Byte:
-            obj = [obj]
-
         # If the object is concrete, use it's own int method
         if obj.concrete:
             return [int(obj)]
+
+        # If it's only one, just put it into a list
+        if type(obj) is Byte:
+            obj = [obj]
 
         # Correct for architecture endianness
         if self.state.project.loader.main_bin.endianness != 'little':
