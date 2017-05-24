@@ -1,3 +1,5 @@
+[ ![Codeship Status for Owlz/larissa](https://codeship.com/projects/580bce60-22a0-0135-eb40-52028c1190b7/status?branch=master)](https://app.codeship.com/projects/221744)
+
 # About
 This is basically a toy project for the moment. I'm curious if I can make Triton be a little more user friendly. I'm planning on modeling interactions after how you would interact through angr and attempt to make the interactions more pythonic.
 
@@ -31,4 +33,4 @@ If you want to install from the repo, you will need to clone it. Given larissa's
 (larissa)$ pip install .
 ```
 
-Be patient. This installer will compile z3 as well as triton. This will take a little while. 
+Be patient. This installer will compile z3 as well as triton. This will take a little while.
