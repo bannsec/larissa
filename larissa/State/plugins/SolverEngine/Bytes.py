@@ -73,6 +73,12 @@ class Bytes(object):
     ##############
 
     @property
+    def concrete(self):
+        """Return true if every Byte in this Bytes object is concrete."""
+        # The converse can sometimes be the faster question
+        return not any(not byte.concrete for byte in self)
+
+    @property
     def bytes(self):
         """The actual list of bytes loaded in this object."""
         return self.__bytes
