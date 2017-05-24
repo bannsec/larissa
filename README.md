@@ -34,3 +34,10 @@ If you want to install from the repo, you will need to clone it. Given larissa's
 ```
 
 Be patient. This installer will compile z3 as well as triton. This will take a little while.
+
+# Unit Tests
+You can run the unit tests with the following command from the root of the git repo:
+
+```bash
+pytest --boxed -n 8 --cov=larissa tests/
+```
