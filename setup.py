@@ -33,17 +33,18 @@ def _get_boost_path():
             return "/usr/include"
 
     # Is it already installed in the virtualenv?
-    if os.path.isdir(os.path.join(sys.prefix, "include", "boost")):
-        # Is it new enough?
-        if _is_boost_new_enough(os.path.join(sys.prefix,"include")):
-            return sys.prefix
-
-    # Is it already installed in the virtualenv?
     # Alternate location
     if os.path.isdir(os.path.join(sys.prefix, "boost", "include", "boost")):
         # Is it new enough?
         if _is_boost_new_enough(os.path.join(sys.prefix,"boost", "include")):
             return os.path.join(sys.prefix, "boost")
+
+    # Is it already installed in the virtualenv?
+    if os.path.isdir(os.path.join(sys.prefix, "include", "boost")):
+        # Is it new enough?
+        if _is_boost_new_enough(os.path.join(sys.prefix,"include")):
+            return sys.prefix
+
 
     return None
 
