@@ -56,15 +56,26 @@ def _install_z3():
 
     os.chdir(os.path.join(here,"lib","z3"))
 
-    os.system("python scripts/mk_make.py --python")
+    try:
+        subprocess.check_output("python scripts/mk_make.py --python",shell=True)
+    except Exception as e:
+        raise Exception(e.output)
+
     os.chdir("build")
-    os.system("make install -j{0}".format(multiprocessing.cpu_count()))
+
+    try:
+        subprocess.check_output("make install -j{0}".format(multiprocessing.cpu_count()),shell=True)
+    except Exception as e:
+        raise Exception(e.output)
 
     os.chdir(here)
 
 def _install_capstone():
     # Triton needs the deps that the wheel file doesn't have
-    os.system("pip install capstone==3.0.5-rc2")
+    try:
+        subprocess.check_output("pip install capstone==3.0.5-rc2",shell=True)
+    except Exception as e:
+        raise Exception(e.output)
 
 def _install_triton():
     # Locate the needed libraries
