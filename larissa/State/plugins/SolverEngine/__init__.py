@@ -45,6 +45,10 @@ class SolverEngine(PluginBase):
         if type(obj) is Byte:
             obj = [obj]
 
+        # If the object is concrete, use it's own int method
+        if obj.concrete:
+            return [int(obj)]
+
         # Correct for architecture endianness
         if self.state.project.loader.main_bin.endianness != 'little':
             bytes = reversed(obj)
