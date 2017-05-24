@@ -3,7 +3,7 @@ logger = logging.getLogger("larissa.State.plugins.SolverEngine.Byte")
 
 class Byte(object):
     
-    def __init__(self, state, address=None, symbolic=False, *args, **kwargs):
+    def __init__(self, state, address=None, symbolic=False, value = None, *args, **kwargs):
         """
         state = larissa.State object of current state.
         address = Optional address to load from.
@@ -12,12 +12,22 @@ class Byte(object):
 
         self.state = state
 
-        self.value = None
 
         # These two are mutually exclusive for now
-        if address and symbolic:
+        if address != None and symbolic:
             logger.error("Cannot specify both address and symbolic for now.")
             return
+
+        # These two are mutually exclusive
+        if address != None and value != None:
+            logger.error("Cannot specify both address and value for now.")
+            return
+
+        if value != None and value > 0xff:
+            logger.error("Value too large to fit in Byte.")
+            return
+
+        self.value = value
 
         # If address is passed, grab it from triton
         self.address = address
@@ -72,6 +82,9 @@ class Byte(object):
 
         # Symbolic
         return self.state.se.any_int(self)
+
+    def __len__(self):
+        return 1
         
 
     ##############
