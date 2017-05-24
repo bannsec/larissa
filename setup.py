@@ -35,16 +35,21 @@ def _get_boost_path():
     # Is it already installed in the virtualenv?
     # Alternate location
     if os.path.isdir(os.path.join(sys.prefix, "boost", "include", "boost")):
+        print("Path 1")
         # Is it new enough?
         if _is_boost_new_enough(os.path.join(sys.prefix,"boost", "include")):
+            print("New enough")
             return os.path.join(sys.prefix, "boost")
 
     # Is it already installed in the virtualenv?
     if os.path.isdir(os.path.join(sys.prefix, "include", "boost")):
+        print("Path 2")
         # Is it new enough?
         if _is_boost_new_enough(os.path.join(sys.prefix,"include")):
+            print("New enough")
             return sys.prefix
 
+    print("Nothing")
 
     return None
 
@@ -85,6 +90,8 @@ def _install_boost():
 
         if major == 1 and minor >= 55:
             return
+
+    print("Installing boost.")
 
     # Looks like we need to build it
     try:
