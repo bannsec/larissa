@@ -31,4 +31,4 @@ If you want to install from the repo, you will need to clone it. Given larissa's
 (larissa)$ pip install .
 ```
 
-Be patient. This installer will compile z3 as well as triton. This will take a little while.
+Be patient. This installer will compile z3 as well as triton. This will take a little while. 
