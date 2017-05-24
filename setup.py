@@ -90,7 +90,7 @@ setup(
         'Environment :: Console'
     ],
     extras_require={
-        'dev': ['ipython<6','twine'],
+        'dev': ['ipython<6','twine','pytest','python-coveralls','coverage','pytest-cov'],
     },
     install_requires=["pyelftools"],
     keywords='symbolic execution triton',
