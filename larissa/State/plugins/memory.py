@@ -12,6 +12,19 @@ class Memory(PluginBase):
         self._page_size = 4096
         self.pages = {}
 
+    def store(self, address, object):
+        """Store object at memory address."""
+
+        if type(object) is unicode:
+            logger.warn("Input data as unicode. Converting it to string as ASCII.")
+            object = object.encode('ascii')
+        
+        if type(object) is str:
+            triton.setConcreteMemoryAreaValue(address, object)
+            return
+
+        logger.error("Unhandled memory store type of {0}".format(type(object)))
+
     def __getitem__(self, item):
         if type(item) in [int, long]:
             return self.state.se.Byte(item)
@@ -95,3 +108,4 @@ class Page(object):
 
         self.__prot = int(prot)
 
+import triton
