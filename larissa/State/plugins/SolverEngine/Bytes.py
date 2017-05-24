@@ -49,7 +49,7 @@ class Bytes(object):
     def __int__(self):
 
         # If we're not entirely concrete
-        if any(not byte.concrete for byte in self):
+        if not self.concrete:
             return self.state.se.any_int(self)
 
         # If we are entirely concrete, just calculate and return
