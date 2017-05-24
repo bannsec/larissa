@@ -12,6 +12,8 @@ class Project(object):
 
         self.simprocedures = SimProcedures(self)
 
+        triton.setAstRepresentationMode(triton.AST_REPRESENTATION.PYTHON)
+
     def __repr__(self):
         return "<Project filename={0}>".format(self.filename)
 
@@ -59,3 +61,4 @@ import os
 from larissa.Factory import Factory
 from larissa.Loader import Loader
 from .SimProcedures import SimProcedures
+import triton

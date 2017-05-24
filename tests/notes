@@ -7,3 +7,6 @@ Once state splitting, verify proper split
   - assert s2.posix.blerg != state.posix.blerg
  - asset hash(s2) != hash(state)
  - etc
+
+Any_n_solver should be unique:
+ - assert len(set(state.se._any_n_int_byte(b[0],256))) == 256

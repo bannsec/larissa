@@ -48,6 +48,12 @@ class Bytes(object):
 
     def __int__(self):
 
+        # If we're not entirely concrete
+        if any(not byte.concrete for byte in self):
+            return self.state.se.any_int(self)
+
+        # If we are entirely concrete, just calculate and return
+
         # Correct for architecture endianness
         if self.state.project.loader.main_bin.endianness != 'little':
             bytes = reversed(self)
@@ -57,7 +63,7 @@ class Bytes(object):
         out = 0
 
         for i, byte in enumerate(bytes):
-            out += int(byte) << (i*8)
+            out += int(byte) << (8 * i)
 
         return out
 
