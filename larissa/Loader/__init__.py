@@ -13,6 +13,13 @@ class Loader(object):
         self._load_all_bins()
 
         self._set_triton_arch()
+        self._set_triton_modes()
+
+    def _set_triton_modes(self):
+
+        # Define symbolic optimizations
+        triton.enableMode(triton.MODE.ALIGNED_MEMORY, False) # TODO: Apparently True is faster? Makes memory access irritating though...
+        triton.enableMode(triton.MODE.ONLY_ON_SYMBOLIZED, True)
 
     def _set_triton_arch(self):
         """Triton needs to know what arch it's dealing with. Figure it out and set it."""

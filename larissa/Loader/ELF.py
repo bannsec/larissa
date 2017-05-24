@@ -30,10 +30,6 @@ class ELF(Loader):
 
         # TODO: Triton works on a global state right now... Update this once Triton gives actual contexts to work with
 
-        # Define symbolic optimizations
-        triton.enableMode(triton.MODE.ALIGNED_MEMORY, False) # TODO: Apparently True is faster? Makes memory access irritating though...
-        triton.enableMode(triton.MODE.ONLY_ON_SYMBOLIZED, True)
-
         elf = triton.Elf(self.project.filename)
         
         #################
