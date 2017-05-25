@@ -95,12 +95,12 @@ def _install_boost():
 
     # Looks like we need to build it
     try:
-        out = subprocess.check_output("pip install -vvv larissa_boost==0.0.3",shell=True)
+        #out = subprocess.check_output("pip install -vvv larissa_boost==0.0.3",shell=True)
         # TODO: This is just to help debugging. Remove This.
-        #os.system("pip download larissa_boost")
-        #os.system("tar xf larissa_boost*")
-        #os.chdir("larissa_boost-0.0.3")
-        #out = subprocess.check_output("python setup.py install",shell=True)
+        os.system("pip download larissa_boost")
+        os.system("tar xf larissa_boost*")
+        os.chdir("larissa_boost-0.0.4")
+        out = subprocess.check_output("python setup.py install",shell=True)
     except Exception as e:
         raise Exception(e.output)
 
