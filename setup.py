@@ -99,6 +99,11 @@ def _install_boost():
     except Exception as e:
         raise Exception(e.output)
 
+    print(os.system("ls -la $VIRTUAL_ENV/"))
+    print(os.system("ls -la $VIRTUAL_ENV/include/"))
+    print(os.system("ls -la $VIRTUAL_ENV/boost/"))
+    print(os.system("ls -la $VIRTUAL_ENV/boost/include"))
+
 
 def _install_z3():
     # Need to build this.
