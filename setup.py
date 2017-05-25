@@ -95,7 +95,7 @@ def _install_boost():
 
     # Looks like we need to build it
     try:
-        out = subprocess.check_output("pip install -vvv larissa_boost",shell=True)
+        out = subprocess.check_output("pip install -vvv larissa_boost==0.0.3",shell=True)
         # TODO: This is just to help debugging. Remove This.
         #os.system("pip download larissa_boost")
         #os.system("tar xf larissa_boost*")
@@ -172,10 +172,8 @@ def _install_triton():
         cmake_options.append("-DBoost_INCLUDE_DIR={0}".format(os.path.join(_get_boost_path(),"include")))
         cmake_options.append("-DBoost_LIBRARY_DIR={0}".format(os.path.join(_get_boost_path(),"lib")))
 
-        #cpath = ["/usr/include"] + cpath
+        cpath = ["/usr/include"] + cpath
         cpath.append(os.path.join(_get_boost_path(),"include"))
-
-    cpath = set(cpath)
 
     try:
         print("cmake {0} ..".format(' '.join(cmake_options)))
