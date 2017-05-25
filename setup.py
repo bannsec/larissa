@@ -147,6 +147,12 @@ def _install_triton():
     cpath.append(find_file("z3_ast_containers.h"))
 
 
+    # TODO: Remove this
+    os.system("rm -rf {0}".format(os.path.join(here,"lib","triton")))
+    os.chdir("lib")
+    os.system("git clone https://github.com/Owlz/Triton.git triton")
+    os.chdir("..")
+
     # Using triton version included in larissa due to triton not being in pypi
     os.chdir(os.path.join(here,"lib","triton"))
     os.mkdir("build")
