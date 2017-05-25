@@ -95,7 +95,7 @@ def _install_boost():
 
     # Looks like we need to build it
     try:
-        out = subprocess.check_output("pip install larissa_boost",shell=True)
+        out = subprocess.check_output("pip install -vvv larissa_boost",shell=True)
     except Exception as e:
         raise Exception(e.output)
 
