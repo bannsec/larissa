@@ -95,10 +95,11 @@ def _install_boost():
 
     # Looks like we need to build it
     try:
-        subprocess.check_output("pip install larissa_boost",shell=True)
+        out = subprocess.check_output("pip install larissa_boost",shell=True)
     except Exception as e:
         raise Exception(e.output)
 
+    print(out)
     print(os.system("ls -la $VIRTUAL_ENV/"))
     print(os.system("ls -la $VIRTUAL_ENV/include/"))
     print(os.system("ls -la $VIRTUAL_ENV/boost/"))
