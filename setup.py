@@ -138,6 +138,9 @@ def _install_capstone():
     except Exception as e:
         raise Exception(e.output)
 
+    # Sym-link it into lib
+    os.symlink(os.path.join(find_file("libcapstone.so"),"libcapstone.so"), os.path.join(sys.prefix,"lib","libcapstone.so.3"))
+
 def _install_triton():
     # Locate the needed libraries
     capstone_include = re.match("(.*)/capstone$", find_file("capstone.h")).group(1)
