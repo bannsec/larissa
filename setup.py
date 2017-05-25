@@ -83,7 +83,7 @@ def _install_boost():
     if _get_boost_path() != None:
 
         # Caveat, it has to be a high enough version...
-        major, minor, patch = _get_boost_version()
+        major, minor, patch = _get_boost_version(_get_boost_path())
 
         if major > 1:
             return
@@ -156,11 +156,13 @@ def _install_triton():
         cpath.append(os.path.join(_get_boost_path(),"include"))
 
     try:
+        print("cmake {0} ..".format(' '.join(cmake_options)))
         subprocess.check_output("cmake {0} ..".format(' '.join(cmake_options)),shell=True)
     except Exception as e:
         raise Exception(e.output)
     
     try:
+        print("CPATH={1} make -j{0} install".format(multiprocessing.cpu_count(), ':'.join(cpath)))
         subprocess.check_output("CPATH={1} make -j{0} install".format(multiprocessing.cpu_count(), ':'.join(cpath)),shell=True)
     except Exception as e:
         raise Exception(e.output)
