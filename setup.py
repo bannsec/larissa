@@ -172,8 +172,10 @@ def _install_triton():
         cmake_options.append("-DBoost_INCLUDE_DIR={0}".format(os.path.join(_get_boost_path(),"include")))
         cmake_options.append("-DBoost_LIBRARY_DIR={0}".format(os.path.join(_get_boost_path(),"lib")))
 
-        cpath = ["/usr/include"] + cpath
+        #cpath = ["/usr/include"] + cpath
         cpath.append(os.path.join(_get_boost_path(),"include"))
+
+    cpath = set(cpath)
 
     try:
         print("cmake {0} ..".format(' '.join(cmake_options)))
