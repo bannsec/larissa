@@ -1,0 +1,4 @@
+main:
+    build:
+        image: larissa
+        dockerfile: Dockerfile

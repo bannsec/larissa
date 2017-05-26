@@ -1,0 +1,5 @@
+- type: serial
+  steps:
+      - name: pytest
+        service: main
+        command: pytest --boxed -n 8 --cov=larissa /larissa/tests/
