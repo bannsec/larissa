@@ -7,7 +7,7 @@ RUN mkdir /larissa
 WORKDIR /larissa
 
 RUN apt-get update && apt-get -y upgrade
-RUN apt-get install -y libboost-all-dev cmake python2.7-dev python-virtualenv g++ git virtualenvwrapper
+RUN apt-get install -y libboost-all-dev cmake python2.7-dev python-virtualenv g++ git virtualenvwrapper gcc-multilib
 
 COPY . .
 
