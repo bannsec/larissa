@@ -6,6 +6,9 @@ RUN mkdir /larissa
 
 WORKDIR /larissa
 
+# Intentionally invalidate cache on version releases
+COPY version.py .
+
 RUN apt-get update && apt-get -y upgrade
 RUN apt-get install -y libboost-all-dev cmake python2.7-dev python-virtualenv g++ git virtualenvwrapper gcc-multilib
 
