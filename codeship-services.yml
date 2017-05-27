@@ -3,3 +3,4 @@ main:
         image: larissa
         dockerfile: Dockerfile
     encrypted_env_file: env.encrypted
+    cached: true
