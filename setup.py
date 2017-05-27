@@ -12,6 +12,7 @@ from glob import glob
 import multiprocessing
 import subprocess
 import re
+from version import version
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -205,7 +206,7 @@ class CustomInstallCommand(install):
 
 setup(
     name='larissa',
-    version='0.0.4',
+    version=version,
     description='Tool to automate working with Triton',
     long_description=long_description,
     url='https://github.com/owlz/larissa',
