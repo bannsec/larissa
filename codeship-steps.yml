@@ -2,7 +2,4 @@
   steps:
       - name: pytest
         service: main
-        command: bash -c "source ~/.virtualenvs/larissa/bin/activate && pytest --boxed -n 8 --cov=larissa --cov-branch /larissa/tests/"
-      - name: coveralls
-        service: main
-        command: bash -c "source ~/.virtualenvs/larissa/bin/activate && coveralls"
+        command: bash -c "source ~/.virtualenvs/larissa/bin/activate && pytest --boxed -n 8 --cov=larissa --cov-branch /larissa/tests/ && coveralls"
