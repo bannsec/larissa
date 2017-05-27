@@ -3,3 +3,6 @@
       - name: pytest
         service: main
         command: bash -c "source ~/.virtualenvs/larissa/bin/activate && pytest --boxed -n 8 --cov=larissa /larissa/tests/"
+      - name: coveralls
+        service: main
+        command: coveralls

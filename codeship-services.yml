@@ -2,3 +2,4 @@ main:
     build:
         image: larissa
         dockerfile: Dockerfile
+    encrypted_env_file: env.encrypted
