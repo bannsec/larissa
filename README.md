@@ -1,5 +1,5 @@
 [ ![Codeship Status for Owlz/larissa](https://codeship.com/projects/580bce60-22a0-0135-eb40-52028c1190b7/status?branch=master)](https://app.codeship.com/projects/221744)
-[![Coverage Status](https://coveralls.io/repos/github/Owlz/larissa/badge.svg?branch=master)](https://coveralls.io/github/Owlz/larissa?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/Owlz/larissa/badge.svg?branch=HEAD)](https://coveralls.io/github/Owlz/larissa?branch=HEAD)
 
 # About
 This is basically a toy project for the moment. I'm curious if I can make Triton be a little more user friendly. I'm planning on modeling interactions after how you would interact through angr and attempt to make the interactions more pythonic.
