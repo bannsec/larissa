@@ -76,3 +76,9 @@ def test_loader_repr():
     proj = larissa.Project(os.path.join(bin_path,"amd64","simple_pic_pie"))
     
     repr(proj.loader)
+
+def test_loader_bad_file_type(monkeypatch):
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_pic_pie"))
+
+    # Test loading something that isn't executable
+    proj.loader._load_bin(os.path.join(bin_path,"amd64","simple.c"))
