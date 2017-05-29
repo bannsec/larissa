@@ -222,9 +222,11 @@ setup(
         'Environment :: Console'
     ],
     extras_require={
-        'dev': ['ipython<6','twine','pytest','python-coveralls','coverage','pytest-cov','pytest-xdist'],
+        'dev': ['ipython<6','twine','pytest','python-coveralls','coverage','pytest-cov','pytest-xdist','pytest-runner'],
     },
     install_requires=["pyelftools"],
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest','python-coveralls','coverage','pytest-cov','pytest-xdist'],
     keywords='symbolic execution triton',
     packages=find_packages(exclude=['contrib', 'docs', 'tests','lib']),
     cmdclass={
