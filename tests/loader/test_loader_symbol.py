@@ -34,12 +34,9 @@ def test_symbol_not_found():
     proj = larissa.Project(os.path.join(bin_path,"ia32","simple_pic_pie"))
     assert proj.loader.symbol('doesnt_exist') == None
 
-"""
-# TODO: Build binary to test this.
-
 def test_symbol_first_option():
-    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    proj = larissa.Project(os.path.join(bin_path,"amd64","symbol_collide"))
 
-    # We expect to find the .text symbol for libc first given this argument.
-    assert 'libc' in proj.loader.symbol('.text', u'libc.so.6').source
-"""
+    # We define gets as a symbol both in the main bin and libc. Main bin will normally be searched first.
+    # Specifying libc here should cause the symbol from libc to be returned.
+    assert 'libc' in proj.loader.symbol('gets', u'libc.so.6').source
