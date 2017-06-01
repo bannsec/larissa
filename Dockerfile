@@ -10,7 +10,7 @@ WORKDIR /larissa
 COPY version.py .
 
 RUN apt-get update && apt-get -y upgrade
-RUN apt-get install -y libboost-all-dev cmake python2.7-dev python-virtualenv g++ git virtualenvwrapper gcc-multilib python-six
+RUN apt-get install -y libboost-all-dev cmake python2.7-dev python-virtualenv g++ git virtualenvwrapper gcc-multilib
 
 COPY . .
 
@@ -22,6 +22,9 @@ RUN mkdir ~/.virtualenvs
 RUN virtualenv --python=$(which python2) ~/.virtualenvs/larissa
 
 RUN bash -c "echo 'source ~/.virtualenvs/larissa/bin/activate' >> /home/larissa/.bashrc"
+
+# No idea why python six doesn't get installed right... Installing it up front.
+RUN bash -c "source ~/.virtualenvs/larissa/bin/activate && pip install six"
 
 RUN bash -c "source ~/.virtualenvs/larissa/bin/activate && pip install .[dev]"
 
