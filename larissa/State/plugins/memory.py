@@ -82,9 +82,12 @@ class Page(object):
     PROT_EXEC  = 0x4
     PROT_NONE  = 0x0
 
-    def __init__(self, prot):
-
+    def __init__(self, prot, mapped=False):
+        """prot = int protection for this memory page (0-7)
+        mapped = bool, is this page mapped?
+        """
         self.prot = prot
+        self.mapped = mapped
 
     @property
     def read(self):
@@ -117,5 +120,18 @@ class Page(object):
             return
 
         self.__prot = int(prot)
+
+    @property
+    def mapped(self):
+        """Is this page file mapped?"""
+        return self.__mapped
+
+    @mapped.setter
+    def mapped(self, mapped):
+        if type(mapped) is not bool:
+            logger.error("Invalid mapped type of {0}".format(type(mapped)))
+            return
+
+        self.__mapped = mapped
 
 import triton

@@ -105,3 +105,17 @@ def test_memory_page_bad_prot_value():
     with pytest.raises(Exception):
         p.prot
 
+def test_memory_page_mapped():
+    p = larissa.State.plugins.memory.Page(1)
+    assert p.mapped == False
+
+    p = larissa.State.plugins.memory.Page(1,mapped=True)
+    assert p.mapped == True
+
+    p.mapped = False
+    assert p.mapped == False
+
+    # Invalid, should just be ignored
+    p.mapped = None
+    assert p.mapped == False
+
