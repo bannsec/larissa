@@ -161,3 +161,17 @@ def test_memory_page_repr():
     p.write = True
     p.execute = True
     assert "Page" in repr(p)
+
+def test_memory_store_byte_concrete():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    b = state.se.Byte(value=12)
+    state.memory[0] = b
+    assert state.memory[0].value == 12
+
+def test_memory_store_byte_symbolic():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    b = state.se.Byte(symbolic=True)
+    state.memory[0] = b
+    assert str(b.value) in str(state.memory[0].value)

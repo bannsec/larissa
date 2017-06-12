@@ -103,9 +103,10 @@ class Byte(object):
 
     @value.setter
     def value(self, value):
-        if type(value) not in [int, long, type(None), Ast]:
-            logger.error("Unhandled Byte value of type {0}".format(type(value)))
-            return
+        # TODO: Re-implement this when I get an actual Ast type definition
+        #if type(value) not in [int, long, type(None), Ast]:
+        #    logger.error("Unhandled Byte value of type {0}".format(type(value)))
+        #    return
 
         self.__value = value
 
@@ -153,4 +154,5 @@ from larissa.State import State
 import triton
 
 # Hack.. Not sure where Ast type is directly defined.
-Ast = type(triton.ast.bv(1,1))
+# This is breaking too much... Need to find a real solution: https://github.com/JonathanSalwan/Triton/issues/557
+#Ast = type(triton.ast.bv(1,1))

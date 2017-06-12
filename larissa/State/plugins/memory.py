@@ -2,6 +2,7 @@ import logging
 logger = logging.getLogger("larissa.State.plugins.memory")
 
 from . import PluginBase
+from .SolverEngine import Byte
 
 class Memory(PluginBase):
 
@@ -14,12 +15,32 @@ class Memory(PluginBase):
     def store(self, address, object):
         """Store object at memory address."""
 
+        def _store_byte_concrete(self,b,address):
+            """Stores byte assuming that it's concrete."""
+            triton.setConcreteMemoryAreaValue(address,[b.value])
+
+        def _store_byte_symbolic(self,b,address):
+            """Stores a byte assuming it is symbolic."""
+            triton.assignSymbolicExpressionToMemory(
+                    triton.newSymbolicExpression(b.value),
+                    triton.MemoryAccess(address, 1)
+                    )
+
         if type(object) is unicode:
             logger.warn("Input data as unicode. Converting it to string as ASCII.")
             object = object.encode('ascii')
         
         if type(object) is str:
             triton.setConcreteMemoryAreaValue(address, object)
+            return
+
+        if type(object) is Byte:
+            if object.concrete:
+                _store_byte_concrete(self, object, address)
+
+            else:
+                _store_byte_symbolic(self, object, address)
+
             return
 
         # TODO: Handle store of Bytes/Byte objects
