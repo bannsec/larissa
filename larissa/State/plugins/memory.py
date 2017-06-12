@@ -23,6 +23,9 @@ class Memory(PluginBase):
             triton.setConcreteMemoryAreaValue(address, object)
             return
 
+        # TODO: Handle store of Bytes/Byte objects
+        # Handle store of int (need to add optional size option)
+
         logger.error("Unhandled memory store type of {0}".format(type(object)))
 
     def __getitem__(self, item):
@@ -76,7 +79,7 @@ class Page(object):
     
     PROT_READ  = 0x1
     PROT_WRITE = 0x2
-    PROT_EXEC  = 0x3
+    PROT_EXEC  = 0x4
     PROT_NONE  = 0x0
 
     def __init__(self, prot):
