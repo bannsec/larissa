@@ -94,15 +94,48 @@ class Page(object):
         """Boolean does page have read permission."""
         return self.prot & self.PROT_READ > 0
 
+    @read.setter
+    def read(self, read):
+        if type(read) is not bool:
+            logger.error("Invalid type for read of {0}".format(type(read)))
+            return
+
+        if read:
+            self.prot = self.prot | self.PROT_READ
+        else:
+            self.prot = self.prot ^ (self.prot & self.PROT_READ)
+
     @property
     def write(self):
         """Boolean does page have write permission."""
         return self.prot & self.PROT_WRITE > 0
 
+    @write.setter
+    def write(self, write):
+        if type(write) is not bool:
+            logger.error("Invalid type for write of {0}".format(type(write)))
+            return
+
+        if write:
+            self.prot = self.prot | self.PROT_WRITE
+        else:
+            self.prot = self.prot ^ (self.prot & self.PROT_WRITE)
+
     @property
     def execute(self):
         """Boolean does page have execute permission."""
         return self.prot & self.PROT_EXEC > 0
+
+    @execute.setter
+    def execute(self, execute):
+        if type(execute) is not bool:
+            logger.error("Invalid type for execute of {0}".format(type(execute)))
+            return
+
+        if execute:
+            self.prot = self.prot | self.PROT_EXEC
+        else:
+            self.prot = self.prot ^ (self.prot & self.PROT_EXEC)
 
     @property
     def prot(self):

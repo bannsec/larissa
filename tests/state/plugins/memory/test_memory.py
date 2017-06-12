@@ -119,3 +119,32 @@ def test_memory_page_mapped():
     p.mapped = None
     assert p.mapped == False
 
+def test_memory_page_read_setter():
+    p = larissa.State.plugins.memory.Page(0)
+    assert p.read == False
+    p.read = True
+    assert p.read == True
+    p.read = False
+    assert p.read == False
+    p.read = None
+    assert p.read == False
+
+def test_memory_page_write_setter():
+    p = larissa.State.plugins.memory.Page(0)
+    assert p.write == False
+    p.write = True
+    assert p.write == True
+    p.write = False
+    assert p.write == False
+    p.write = None
+    assert p.write == False
+
+def test_memory_page_execute_setter():
+    p = larissa.State.plugins.memory.Page(0)
+    assert p.execute == False
+    p.execute = True
+    assert p.execute == True
+    p.execute = False
+    assert p.execute == False
+    p.execute = None
+    assert p.execute == False
