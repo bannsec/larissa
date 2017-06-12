@@ -102,3 +102,17 @@ def test_solverengine_byte_int():
     b = larissa.State.plugins.SolverEngine.Byte(state,symbolic=True)
     assert type(int(b)) in [int, long]
 
+def test_solverengine_byte_page_attr():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    # No page assigned to start
+    assert state.memory[0x100].page == None
+
+    # Assign page
+    state.memory.pages[0] = larissa.State.plugins.memory.Page(7)
+    assert state.memory[0x100].page.execute == True
+
+    # Test byte that is not from memory
+    b = state.se.Byte()
+    assert b.page == None
+

@@ -40,6 +40,6 @@ Be patient. This installer will compile z3 as well as triton. This will take a l
 You can run the unit tests with the following command from the root of the git repo:
 
 ```bash
-$ pytest --boxed -n 8 --cov=larissa tests/
-$ pytest --boxed -n 8 --cov=larissa --cov-report=html tests/ # For pretty html output
+$ pytest --boxed -n 8 --cov=larissa --cov-config=.coveragerc tests/
+$ pytest --boxed -n 8 --cov=larissa --cov-config=.coveragerc --cov-report=html tests/ # For pretty html output
 ```

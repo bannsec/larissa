@@ -139,6 +139,21 @@ class Byte(object):
         if address is not None:
             self._load_from_memory()
 
+    @property
+    def page(self):
+        """Returns the corresponding page element for this Byte object."""
+        if self.address == None:
+            logger.error("This Byte is not from an address.")
+            return None
+
+        page_number = self.address / self.state.memory._page_size
+        
+        if page_number not in self.state.memory.pages:
+            logger.error("Couldn't find a page backing for this memory address...")
+            return None
+
+        return self.state.memory.pages[page_number]
+
 from larissa.State import State
 import triton
 

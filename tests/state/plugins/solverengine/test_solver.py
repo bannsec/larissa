@@ -32,92 +32,32 @@ def test_solverengine_solver_repr():
     state = proj.factory.entry_state()
     repr(state.se)
 
-"""
-def test_solverengine_bytes_basic():
+def test_solverengine_solver_anyint_badobj():
     proj = larissa.Project(os.path.join(bin_path,"amd64","simple_pic_pie"))
     state = proj.factory.entry_state()
-    b = larissa.State.plugins.SolverEngine.Bytes(state)
+    assert state.se.any_int("bad") == None
 
-def test_solverengine_bytes_addr_and_symbolic():
+def test_solverengine_solver_any_n_int_badobj():
     proj = larissa.Project(os.path.join(bin_path,"amd64","simple_pic_pie"))
     state = proj.factory.entry_state()
-    b = larissa.State.plugins.SolverEngine.Bytes(state,address=1234,symbolic=True)
-    assert not hasattr(b,"length")
+    assert state.se.any_n_int("bad",5) == None
 
-def test_solverengine_bytes_symbolic():
+def test_solverengine_solver_any_n_int_from_int():
     proj = larissa.Project(os.path.join(bin_path,"amd64","simple_pic_pie"))
     state = proj.factory.entry_state()
-    b = larissa.State.plugins.SolverEngine.Bytes(state,length=32,symbolic=True)
-    # Should be 32 bytes in length
-    assert len(b) == 32
-    # Every byte should be symbolic
-    assert all((not x.concrete for x in b))
+    assert state.se.any_n_int(1337,5) == [1337]
 
-def test_solverengine_bytes_address():
-    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+def test_solverengine_solver_anystr_badobj():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_pic_pie"))
     state = proj.factory.entry_state()
-    b = larissa.State.plugins.SolverEngine.Bytes(state,length=8,address=0x0040053c)
-    expected = [0x55,0x48,0x89,0xe5,0x48,0x83,0xec,0x20]
-    for x,y in zip(b,expected):
-        assert x.value == y
+    assert state.se.any_str(None) == None
 
-def test_solverengine_bytes_repr():
-    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+def test_solverengine_solver_anynstr_badobj():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_pic_pie"))
     state = proj.factory.entry_state()
-    b = larissa.State.plugins.SolverEngine.Bytes(state,length=8,address=0x0040053c)
-    assert "address" in repr(b)
-    assert "length" in repr(b)
-    assert "Symbolic" not in repr(b)
+    assert state.se.any_n_str(None,12) == None
 
-    b = larissa.State.plugins.SolverEngine.Bytes(state,length=8,symbolic=True)
-    assert "address" not in repr(b)
-    assert "length" in repr(b)
-    assert "Symbolic" in repr(b)
-
-def test_solverengine_bytes_getitem():
-    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+def test_solverengine_solver_anystr_trivial():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_pic_pie"))
     state = proj.factory.entry_state()
-    b = larissa.State.plugins.SolverEngine.Bytes(state,length=8,address=0x0040053c)
-    assert int(b[2]) == 0x89
-
-def test_solverengine_bytes_str():
-    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
-    state = proj.factory.entry_state()
-    b = larissa.State.plugins.SolverEngine.Bytes(state,length=5,address=0x0040053c)
-    assert str(b) == "UH\x89\xe5H"
-
-def test_solverengine_bytes_bytes_badsetter():
-    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
-    state = proj.factory.entry_state()
-    b = larissa.State.plugins.SolverEngine.Bytes(state,length=5,address=0x0040053c)
-    # If this fails, it should simply not set
-    orig = b.bytes
-    b.bytes = "test"
-    assert b.bytes == orig
-
-def test_solverengine_bytes_length_badsetter():
-    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
-    state = proj.factory.entry_state()
-    b = larissa.State.plugins.SolverEngine.Bytes(state,length=5,address=0x0040053c)
-    # If this fails, it should simply not set
-    l = b.length
-    b.length = "test"
-    assert b.length == l
-
-def test_solverengine_bytes_address_badsetter():
-    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
-    state = proj.factory.entry_state()
-    b = larissa.State.plugins.SolverEngine.Bytes(state,length=5,address=0x0040053c)
-    # If this fails, it should simply not set
-    orig = b.address
-    b.address = "blerg"
-    assert b.address == orig
-
-def test_solverengine_bytes_state_badsetter():
-    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
-    state = proj.factory.entry_state()
-    b = larissa.State.plugins.SolverEngine.Bytes(state,length=5,address=0x0040053c)
-
-    with pytest.raises(Exception):
-        b.state = "blerg"
-"""
+    assert state.se.any_str(77) == "M"

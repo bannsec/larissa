@@ -1,0 +1,7 @@
+[run]
+# Check coverage of branches
+branch = True
+omit = tests/*
+       larissa/Colorer.py
+
+[report]
