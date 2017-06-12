@@ -147,11 +147,6 @@ class Byte(object):
             return None
 
         page_number = self.address / self.state.memory._page_size
-        
-        if page_number not in self.state.memory.pages:
-            logger.error("Couldn't find a page backing for this memory address...")
-            return None
-
         return self.state.memory.pages[page_number]
 
 from larissa.State import State

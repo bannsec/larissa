@@ -106,7 +106,7 @@ def test_solverengine_byte_page_attr():
     proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
     state = proj.factory.entry_state()
     # No page assigned to start
-    assert state.memory[0x100].page == None
+    assert state.memory[0x100].page.mapped == False
 
     # Assign page
     state.memory.pages[0] = larissa.State.plugins.memory.Page(7)

@@ -3,14 +3,13 @@ logger = logging.getLogger("larissa.State.plugins.memory")
 
 from . import PluginBase
 
-
 class Memory(PluginBase):
 
     def __init__(self, state, *args, **kwargs):
 
         self.state = state
         self._page_size = 4096
-        self.pages = {}
+        self.pages = Pages()
 
     def store(self, address, object):
         """Store object at memory address."""
@@ -57,6 +56,18 @@ class Memory(PluginBase):
 
         self.store(key, value)
 
+    @property
+    def pages(self):
+        return self.__pages
+
+    @pages.setter
+    def pages(self, pages):
+        if type(pages) is not Pages:
+            logger.error("Attempting to set pages to invalid type of {0}".format(type(pages)))
+            return
+
+        self.__pages = pages
+
     ############
     # Property #
     ############
@@ -68,11 +79,36 @@ class Memory(PluginBase):
 
     @pages.setter
     def pages(self, pages):
-        if type(pages) is not dict:
+        if type(pages) is not Pages:
             logger.error("Invalid type for pages of {0}".format(type(pages)))
             return
 
         self.__pages = pages
+
+class Pages(object):
+    """Silly abstraction for pages to allow pages to be created on the fly."""
+    def __init__(self):
+        self.pages = {}
+
+    def __getitem__(self, item):
+        if type(item) not in [int, long]:
+            logger.error("Not handling this getter of {0}".format(type(item)))
+            return
+
+        # Create new page on the fly
+        if item not in self.pages:
+            # Default to zero prot and unmapped
+            p = Page(prot=0, mapped=False)
+            self.pages[item] = p
+
+        return self.pages[item]
+
+    def __setitem__(self,key,value):
+        # Just passing through for now
+        self.pages[key] = value
+
+    def __repr__(self):
+        return "<Pages {0}>".format(len(self.pages))
 
 class Page(object):
     """Simple object abstracting a memory page."""

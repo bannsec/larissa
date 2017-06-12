@@ -64,20 +64,13 @@ def test_memory_setitem_unhandled_key_type():
 def test_memory_get_pages():
     proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
     state = proj.factory.entry_state()
-    # TODO: For now, pages are not implemented
-    assert state.memory.pages == {}
+    assert type(state.memory.pages) == larissa.State.plugins.memory.Pages
 
 def test_memory_page_badsetter():
     proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
     state = proj.factory.entry_state()
     state.memory.pages = None
-    assert state.memory.pages == {}
-
-def test_memory_page_badsetter():
-    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
-    state = proj.factory.entry_state()
-    state.memory.pages = None
-    assert state.memory.pages == {}
+    assert type(state.memory.pages) == larissa.State.plugins.memory.Pages
 
 def test_memory_page_permissions():
     p = larissa.State.plugins.memory.Page(1)
@@ -148,3 +141,13 @@ def test_memory_page_execute_setter():
     assert p.execute == False
     p.execute = None
     assert p.execute == False
+
+def test_memory_pages_badgetter():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    assert state.memory.pages['blerg'] == None
+
+def test_memory_pages_repr():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    assert "Pages" in repr(state.memory.pages)
