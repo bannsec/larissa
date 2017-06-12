@@ -151,3 +151,13 @@ def test_memory_pages_repr():
     proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
     state = proj.factory.entry_state()
     assert "Pages" in repr(state.memory.pages)
+
+def test_memory_page_repr():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    p = state.memory[0].page
+    assert "Page" in repr(p)
+    p.read = True
+    p.write = True
+    p.execute = True
+    assert "Page" in repr(p)

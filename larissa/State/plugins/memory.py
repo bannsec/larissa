@@ -125,6 +125,27 @@ class Page(object):
         self.prot = prot
         self.mapped = mapped
 
+    def __repr__(self):
+        return "<Page permissions={0}>".format(self.prot_str)
+
+    @property
+    def prot_str(self):
+        """String representation of the protection for this page."""
+        prot = ""
+        if self.read:
+            prot += "R"
+        else:
+            prot += "-"
+        if self.write:
+            prot += "W"
+        else:
+            prot += "-"
+        if self.execute:
+            prot += "X"
+        else:
+            prot += "-"
+        return prot
+
     @property
     def read(self):
         """Boolean does page have read permission."""
