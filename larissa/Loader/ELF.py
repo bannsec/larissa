@@ -41,7 +41,6 @@ class ELF(Loader):
         # TODO: Don't allow overlaps
         # TODO: Support loading at different address
 
-        """
         # TODO: Flesh out the actual appropriate way to load...
         load_segments = [seg for seg in self.elffile.iter_segments() if seg['p_type'] == "PT_LOAD"]
 
@@ -52,13 +51,19 @@ class ELF(Loader):
             state.memory[vaddr] = segment.data()
 
             # TODO: Probably not handling p_align correctly
-            for i in range(0, size, state.memory._page_size) + [vaddr+size-1]:
+            for i in range(0, size, state.memory._page_size) + [size-1]:
                 # TODO: Check for overlapping page permissions...
                 page = state.memory[vaddr+i].page
                 page.mapped = True
-                page.prot = flags
-        """
+                # Segment permission flags are backwards from normal linux...
+                if flags & 1 > 0:
+                    page.execute = True
+                if flags & 2 > 0:
+                    page.write = True
+                if flags & 4 > 0:
+                    page.read = True
 
+        """
         # Not all sections are loadable
         loadable_sections = [section for section in self.sections if section['sh_flags'] & 2]
 
@@ -85,7 +90,7 @@ class ELF(Loader):
                 if section['sh_flags'] & 0x4 > 0:
                     page.execute = True
 
-
+        """
         ###############
         # Relocations #
         ###############

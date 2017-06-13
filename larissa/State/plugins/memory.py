@@ -137,6 +137,9 @@ class Pages(object):
         # Just passing through for now
         self.pages[key] = value
 
+    def __len__(self):
+        return len(self.pages)
+
     def __repr__(self):
         return "<Pages {0}>".format(len(self.pages))
 

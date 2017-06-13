@@ -25,11 +25,15 @@ def test_loader_basic_page_permissions():
     state = proj.factory.entry_state()
     main = proj.loader.main_bin.symbols['main']
     assert state.memory[main.addr].page.mapped == True
-    assert state.memory[main.addr].page.prot == 5
+    assert state.memory[main.addr].page.read == True
+    assert state.memory[main.addr].page.execute == True
+    assert state.memory[main.addr].page.write == False
 
     bss = proj.loader.main_bin.symbols['.bss']
     assert state.memory[bss.addr].page.mapped == True
-    assert state.memory[bss.addr].page.prot == 3
+    assert state.memory[bss.addr].page.read == True
+    assert state.memory[bss.addr].page.write == True
+    assert state.memory[bss.addr].page.execute == False
 
 """
 def test_shared_objects_64_simple_pic_pie():
