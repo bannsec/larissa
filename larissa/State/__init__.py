@@ -7,7 +7,7 @@ class State(object):
 
     def symbol(self, name):
         """Lookup symbol by name, return with address adjusted for loaded base."""
-        symbol = self.project.loader.main_bin.symbols[name]
+        symbol = copy(self.project.loader.main_bin.symbols[name])
 
         if symbol == None:
             return symbol
@@ -71,6 +71,7 @@ import triton
 from larissa.Project import Project
 from . import plugins
 import importlib
+from copy import copy
 
 # Location of plugins
 plugins_dir = os.path.dirname(plugins.__file__)
