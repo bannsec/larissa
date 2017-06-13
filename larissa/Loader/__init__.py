@@ -49,6 +49,8 @@ class Loader(object):
             logger.error("Something went wrong. Unable to load specified file.")
             return
 
+        self.main_bin.main_bin = True
+
         # TODO: Be sure to check the deps of the deps... Maybe make this recursive?
         # Now try to load the deps
         for name in self.main_bin.shared_objects:

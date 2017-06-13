@@ -10,9 +10,11 @@ class ELF(Loader):
         """
         project = larissa.Project
         filename = string path to file to load (default: filename of the loaded project
+        main_bin = bool, is this the main binary
         """
 
         self.project = project
+        self.main_bin = False
 
         self.filename = filename or self.project.filename
         self.file = open(self.filename,"rb")
