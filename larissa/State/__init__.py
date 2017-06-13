@@ -4,6 +4,20 @@ class State(object):
     def __init__(self, project):
         self.project = project
         self._populate_plugins()
+
+    def symbol(self, name):
+        """Lookup symbol by name, return with address adjusted for loaded base."""
+        symbol = self.project.loader.main_bin.symbols[name]
+
+        if symbol == None:
+            return symbol
+
+        # If it's relocatable, need to update the address
+        if symbol.source in self.project.loader.shared_objects or self.project.loader.main_bin.address == 0:
+            symbol.addr += self.posix.base_addrs[symbol.source]
+
+        return symbol
+
         
     def _populate_plugins(self):
         """Dynamically find plugins, import and track them. Only call once."""
