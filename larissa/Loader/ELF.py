@@ -14,7 +14,7 @@ class ELF(Loader):
         """
 
         self.project = project
-        self.main_bin = False
+        self.main_bin = False # This will get set by the base loader
 
         self.filename = filename or self.project.filename
         self.file = open(self.filename,"rb")
@@ -25,6 +25,33 @@ class ELF(Loader):
             self.address = next(seg for seg in self.segments if seg['p_type'] == "PT_LOAD")['p_vaddr']
         except StopIteration:
             self.address = None
+
+    def _find_good_load_addr(self, segment, state):
+        """Find a good load address for the given segment."""
+
+        # TODO: Check that it's good?
+        if self.address != 0:
+            if segment['p_vaddr'] != 0:
+                return segment['p_vaddr']
+            else:
+                raise Exception("Not sure how this happened. Our base address != 0 but the segment p_vaddr == 0?")
+
+        ###################################
+        # This binary is PIE of some sort #
+        ###################################
+
+        # If it's main bin, special location
+        main_bin_loc = 0x56000000 + segment['p_vaddr']
+        if self.main_bin:
+            # Step until we find a free spot
+            while state.memory[main_bin_loc].page.mapped:
+                main_bin_loc += state.memory._page_size
+
+            return main_bin_loc
+
+        else:
+            logger.error("Not handling shared library mmap'ing yet.")
+            raise Exception("Not handling shared library mmap'ing yet.")
 
         
     def map_sections(self, state):
@@ -47,7 +74,7 @@ class ELF(Loader):
         load_segments = [seg for seg in self.elffile.iter_segments() if seg['p_type'] == "PT_LOAD"]
 
         for segment in load_segments:
-            vaddr = segment['p_vaddr']
+            vaddr = self._find_good_load_addr(segment,state)
             size = segment['p_memsz'] 
             flags = segment['p_flags']
             state.memory[vaddr] = segment.data()
@@ -64,6 +91,10 @@ class ELF(Loader):
                     page.write = True
                 if flags & 4 > 0:
                     page.read = True
+
+            # Record the base address
+            if load_segments.index(segment) == 0:
+                state.posix.base_addrs[os.path.basename(self.filename)] = vaddr
 
         """
         # Not all sections are loadable
