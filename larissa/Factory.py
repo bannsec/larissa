@@ -7,7 +7,14 @@ class Factory(object):
         self.project = project
 
     def entry_state(self):
-        return State(self.project)
+        # Start a new state
+        state = State(self.project)
+        
+        # Init the state
+        state.binary = self.project.loader.main_bin.map_sections(state)
+
+        # Return it
+        return state
 
 
     ##############

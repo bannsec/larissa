@@ -5,10 +5,6 @@ class State(object):
         self.project = project
         self._populate_plugins()
         
-        # Init the state
-        self.binary = self.project.loader.main_bin.map_sections(self)
-
-
     def _populate_plugins(self):
         """Dynamically find plugins, import and track them. Only call once."""
         
