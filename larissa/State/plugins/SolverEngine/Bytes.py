@@ -88,6 +88,9 @@ class Bytes(object):
 
         return out
 
+    def pp(self):
+        """Pretty prints this bytes object as assembly instructions."""
+        self.state.disasm.pp(self)
 
     ##############
     # Properties #

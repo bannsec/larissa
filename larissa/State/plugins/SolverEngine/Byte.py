@@ -9,9 +9,7 @@ class Byte(object):
         address = Optional address to load from.
         symbolic = Should this byte be symbolic.
         """
-
         self.state = state
-
 
         # These two are mutually exclusive for now
         if address != None and symbolic:
@@ -35,6 +33,10 @@ class Byte(object):
         if symbolic:
             # Whip up a new variable byte
             self.value = triton.ast.variable(triton.newSymbolicVariable(8))
+
+    def pp(self):
+        """Pretty prints this bytes object as assembly instructions."""
+        self.state.disasm.pp(self)
 
     def _load_from_memory(self):
         """Look at the current stored address and attempt to load it into this object."""
