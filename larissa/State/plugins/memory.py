@@ -156,7 +156,7 @@ class Page(object):
         self.mapped = mapped
 
     def __repr__(self):
-        return "<Page permissions={0}>".format(self.prot_str)
+        return "<Page permissions={0} mapped={1}>".format(self.prot_str,self.mapped)
 
     @property
     def prot_str(self):
