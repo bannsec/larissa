@@ -3,11 +3,11 @@ class State(object):
 
     def __init__(self, project):
         self.project = project
+        self._populate_plugins()
         
         # Init the state
-        self.binary = self.project.loader.main_bin.map_sections(None)
+        self.binary = self.project.loader.main_bin.map_sections(self)
 
-        self._populate_plugins()
 
     def _populate_plugins(self):
         """Dynamically find plugins, import and track them. Only call once."""

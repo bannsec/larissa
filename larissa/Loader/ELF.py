@@ -40,7 +40,25 @@ class ELF(Loader):
         # TODO: Integrate with page objects
         # TODO: Don't allow overlaps
         # TODO: Support loading at different address
-        
+
+        """
+        # TODO: Flesh out the actual appropriate way to load...
+        load_segments = [seg for seg in self.elffile.iter_segments() if seg['p_type'] == "PT_LOAD"]
+
+        for segment in load_segments:
+            vaddr = segment['p_vaddr']
+            size = segment['p_memsz'] 
+            flags = segment['p_flags']
+            state.memory[vaddr] = segment.data()
+
+            # TODO: Probably not handling p_align correctly
+            for i in range(0, size, state.memory._page_size) + [vaddr+size-1]:
+                # TODO: Check for overlapping page permissions...
+                page = state.memory[vaddr+i].page
+                page.mapped = True
+                page.prot = flags
+        """
+
         # Not all sections are loadable
         loadable_sections = [section for section in self.sections if section['sh_flags'] & 2]
 
@@ -49,7 +67,24 @@ class ELF(Loader):
             vaddr  = section.header['sh_addr']
             name   = section.name
             logger.debug('Loading 0x%08x - 0x%08x -- %s' %(vaddr, vaddr+size, name))
-            triton.setConcreteMemoryAreaValue(vaddr, section.data())
+            state.memory[vaddr] = section.data()
+
+            # Mark this memory as mapped, set permissions accordingly
+            for i in range(0, size, state.memory._page_size) + [vaddr+size-1]:
+                # TODO: Check for overlapping page permissions...
+                page = state.memory[vaddr+i].page
+                page.mapped = True
+                # Everything is default readable
+                page.read = True
+
+                # Section is writable
+                if section['sh_flags'] & 0x1 > 0:
+                    page.write = True
+
+                # Section is executable
+                if section['sh_flags'] & 0x4 > 0:
+                    page.execute = True
+
 
         ###############
         # Relocations #

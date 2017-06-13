@@ -19,10 +19,10 @@ class Memory(PluginBase):
             """Stores byte assuming that it's concrete."""
             triton.setConcreteMemoryAreaValue(address,[b.value])
 
-        def _store_byte_symbolic(self,b,address):
+        def _store_byte_symbolic(self,b,address,ast=False):
             """Stores a byte assuming it is symbolic."""
             triton.assignSymbolicExpressionToMemory(
-                    triton.newSymbolicExpression(b.value),
+                    triton.newSymbolicExpression(b.value if not ast else b),
                     triton.MemoryAccess(address, 1)
                     )
 
