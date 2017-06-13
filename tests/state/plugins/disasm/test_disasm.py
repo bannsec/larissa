@@ -14,7 +14,9 @@ def test_disasm_basic():
     state = proj.factory.entry_state()
     main = state.symbol('main')
     b = state.memory[main.addr:main.addr+32]
+    b.disasm()
     b.pp()
     b = state.memory[main.addr]
+    b.disasm()
     b.pp()
 

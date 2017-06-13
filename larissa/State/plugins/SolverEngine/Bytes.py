@@ -92,6 +92,10 @@ class Bytes(object):
         """Pretty prints this bytes object as assembly instructions."""
         self.state.disasm.pp(self)
 
+    def disasm(self):
+        """Return disassembly generator."""
+        return self.state.disasm.disasm(self)
+
     ##############
     # Properties #
     ##############

@@ -38,6 +38,10 @@ class Byte(object):
         """Pretty prints this bytes object as assembly instructions."""
         self.state.disasm.pp(self)
 
+    def disasm(self):
+        """Return disassembly generator."""
+        return self.state.disasm.disasm(self)
+
     def _load_from_memory(self):
         """Look at the current stored address and attempt to load it into this object."""
         if self.address is None:
