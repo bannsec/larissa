@@ -2,7 +2,7 @@ import logging
 logger = logging.getLogger("larissa.State.plugins.memory")
 
 from . import PluginBase
-from .SolverEngine import Byte
+from .SolverEngine import Byte, Bytes
 
 class Memory(PluginBase):
 
@@ -43,8 +43,17 @@ class Memory(PluginBase):
 
             return
 
-        # TODO: Handle store of Bytes/Byte objects
-        # Handle store of int (need to add optional size option)
+        if type(object) is Bytes:
+            for i, b in enumerate(object):
+                if b.concrete:
+                    _store_byte_concrete(self, b, address+i)
+
+                else:
+                    _store_byte_symbolic(self, b, address+i)
+
+            return
+
+        # TODO: Handle store of int (need to add optional size option)
 
         logger.error("Unhandled memory store type of {0}".format(type(object)))
 

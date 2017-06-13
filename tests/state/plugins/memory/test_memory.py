@@ -175,3 +175,19 @@ def test_memory_store_byte_symbolic():
     b = state.se.Byte(symbolic=True)
     state.memory[0] = b
     assert str(b.value) in str(state.memory[0].value)
+
+def test_memory_store_bytes_concrete():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    main = proj.loader.main_bin.symbols['main']
+    b = state.memory[main.addr:main.addr + 32]
+    state.memory[0] = b
+    assert str(state.memory[0:32]) == str(b)
+
+def test_memory_store_bytes_symbolic():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    b = state.se.Bytes(length=32,symbolic=True)
+    state.memory[0] = b
+    for i in range(32):
+        assert str(b[i]) in str(state.memory[i])
