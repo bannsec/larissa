@@ -35,29 +35,15 @@ def test_loader_basic_page_permissions():
     assert state.memory[bss.addr].page.write == True
     assert state.memory[bss.addr].page.execute == False
 
-"""
-def test_shared_objects_64_simple_pic_pie():
-    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_pic_pie"))
-    assert len(proj.loader.shared_objects) == 1
-    assert type(proj.loader.shared_objects[u'libc.so.6']) == ELF
-    
-def test_shared_objects_64_simple_nopic_nopie():
-    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
-    assert len(proj.loader.shared_objects) == 1
-    assert type(proj.loader.shared_objects[u'libc.so.6']) == ELF
+def test_loader_triton_elf():
+    for arch in ["amd64","ia32"]:
+        for binary in ["simple_pic_pie","simple_nopic_nopie"]:
+            print("Loading {0} {1}".format(arch, binary))
+            proj = larissa.Project(os.path.join(bin_path,arch,binary))
+            
+            # Main bin
+            proj.loader.main_bin.triton_elf.getSize()
 
-def test_shared_objects_32_simple_nopic_nopie():
-    proj = larissa.Project(os.path.join(bin_path,"ia32","simple_nopic_nopie"))
-    assert len(proj.loader.shared_objects) == 1
-    assert type(proj.loader.shared_objects[u'libc.so.6']) == ELF
-
-def test_shared_objects_32_simple_nopic_pie():
-    proj = larissa.Project(os.path.join(bin_path,"ia32","simple_nopic_pie"))
-    assert len(proj.loader.shared_objects) == 1
-    assert type(proj.loader.shared_objects[u'libc.so.6']) == ELF
-
-def test_shared_objects_32_simple_pic_pie():
-    proj = larissa.Project(os.path.join(bin_path,"ia32","simple_pic_pie"))
-    assert len(proj.loader.shared_objects) == 1
-    assert type(proj.loader.shared_objects[u'libc.so.6']) == ELF
-"""
+            # Shared libs
+            for lib in proj.loader.shared_objects.values():
+                lib.triton_elf.getSize()
