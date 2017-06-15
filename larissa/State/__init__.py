@@ -52,7 +52,8 @@ class State(object):
         if type(name) in [int, long]:
             return symbol_by_address(self, name)
 
-        symbol = copy(self.project.loader.main_bin.symbols[name])
+        # Normal lookup
+        symbol = copy(self.project.loader.symbol(name))
 
         if symbol == None:
             return symbol
