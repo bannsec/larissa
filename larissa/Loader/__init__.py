@@ -121,8 +121,9 @@ class Loader(object):
         if name in self.shared_objects:
             return self.shared_objects[name]
 
-        if name in [os.path.basename(self.shared_objects[obj].filename) for obj in self.shared_objects]:
-            return self.shared_objects[obj]
+        internal_names = [obj for obj in self.shared_objects.values() if os.path.basename(obj.filename) == name]
+        if len(internal_names) == 1:
+            return internal_names[0]
 
         logger.warn("Unable to find object with name {0}".format(name))
 
