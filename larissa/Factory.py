@@ -10,8 +10,12 @@ class Factory(object):
         # Start a new state
         state = State(self.project)
         
-        # Init the state
-        state.binary = self.project.loader.main_bin.map_sections(state)
+        # Map the main binary into memory
+        self.project.loader.main_bin.map_sections(state)
+
+        # Map the shared objects into memory
+        for obj in self.project.loader.shared_objects:
+            self.project.loader.shared_objects[obj].map_sections(state)
 
         # Return it
         return state

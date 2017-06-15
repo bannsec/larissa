@@ -29,7 +29,8 @@ class ELF(Loader):
     def _find_good_load_addr(self, segment, state):
         """Find a good load address for the given segment."""
 
-        # TODO: Check that it's good?
+        # TODO: Check that the requested base is not already taken.
+        # Non-PIE load address
         if self.address != 0:
             if segment['p_vaddr'] != 0:
                 return segment['p_vaddr']
@@ -49,24 +50,35 @@ class ELF(Loader):
 
             return main_bin_loc
 
+        # Shared Library
         else:
-            logger.error("Not handling shared library mmap'ing yet.")
-            raise Exception("Not handling shared library mmap'ing yet.")
+            # Check if we already have a base for this library
+            if os.path.basename(self.filename) in state.posix.base_addrs:
+                return state.posix.base_addrs[os.path.basename(self.filename)] + segment['p_vaddr']
+
+            # Looks like we don't have a base address for this yet, time to find one.
+            # TODO: Replace this with mmap call or something once implemented.
+            while state.memory[state.libc.mmap_base].page.mapped:
+                state.libc.mmap_base += state.memory._page_size
+
+            # Put a page in-between
+            state.libc.mmap_base += state.memory._page_size
+
+            # Record it
+            state.posix.base_addrs[os.path.basename(self.filename)] = state.libc.mmap_base
+
+            return state.posix.base_addrs[os.path.basename(self.filename)]
 
         
     def map_sections(self, state):
-        """Return an init triton object for the relevant architecture."""
+        """Takes in State object and attempts to map this ELF files sections into it."""
 
         # TODO: Triton works on a global state right now... Update this once Triton gives actual contexts to work with
 
-        elf = triton.Elf(self.project.filename)
-        
         #################
         # Load sections #
         #################
 
-        # TODO: Incorporate map permissions
-        # TODO: Integrate with page objects
         # TODO: Don't allow overlaps
         # TODO: Support loading at different address
 
@@ -132,6 +144,7 @@ class ELF(Loader):
         #for pltIndex in range(len(customRelocation)):
         #    customRelocation[pltIndex][2] = BASE_PLT + pltIndex
 
+        """
         # Perform our own relocations
         symbols = elf.getSymbolsTable()
         relocations = elf.getRelocationTable()
@@ -147,7 +160,12 @@ class ELF(Loader):
             #        break
 
         return elf
-        
+        """
+
+        # Fixup mmap base
+        while state.memory[state.libc.mmap_base].page.mapped:
+            state.libc.mmap_base += state.memory._page_size
+
 
     def section(self, section):
         """Returns the section object for the given section name or number or None if not found."""
@@ -423,6 +441,11 @@ class ELF(Loader):
         self.__symbols = symbols
 
         return symbols
+
+    @property
+    def triton_elf(self):
+        """Returns a Triton elf object for this binary."""
+        return triton.Elf(self.project.filename)
             
 
 

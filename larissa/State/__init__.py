@@ -24,8 +24,12 @@ class State(object):
                 return
 
             # Library
-            if base in self.project.loader.shared_objects:
-                out = [self.project.loader.shared_objects[base].symbols[sym] for sym in self.project.loader.shared_objects[base].symbols if self.project.loader.main_bin.symbols[sym].addr == address - self.posix.base_addrs[base]]
+            for shared_object in self.project.loader.shared_objects.values():
+                if os.path.basename(shared_object.filename) != base:
+                    continue
+
+                out = [shared_object.symbols[sym] for sym in shared_object.symbols if shared_object.symbols[sym].addr == address - self.posix.base_addrs[base]]
+
                 if out == []:
                     return None
                 out = copy(out[0])
@@ -59,7 +63,7 @@ class State(object):
             return symbol
 
         # If it's relocatable, need to update the address
-        if symbol.source in self.project.loader.shared_objects or self.project.loader.main_bin.address == 0:
+        if symbol.source in [os.path.basename(self.project.loader.shared_objects[name].filename) for name in self.project.loader.shared_objects] or self.project.loader.main_bin.address == 0:
             symbol.addr += self.posix.base_addrs[symbol.source]
 
         return symbol
