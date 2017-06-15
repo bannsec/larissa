@@ -31,3 +31,12 @@ def test_disasm_call_symbol_resolution(capsys):
             b.pp()
             out, err = capsys.readouterr()
             assert "print_hello" in out
+
+def test_disasm_call_not_int():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    # Contains "call    qword ptr [r12 + rbx*8]" instruction
+    b = state.memory[0x4005a9:0x4005bb]
+    # Just making sure it doesn't cause exception
+    b.pp()
+

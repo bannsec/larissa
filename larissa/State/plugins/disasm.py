@@ -1,6 +1,14 @@
 
 from . import PluginBase
 
+def is_int(s):
+    """Silly function to check if string s represents an integer."""
+    try:
+        int(s,16)
+        return True
+    except:
+        return False
+
 class Disasm(PluginBase):
     """Plugin to handle disassembling instructions."""
 
@@ -16,7 +24,7 @@ class Disasm(PluginBase):
             comments = []
 
             # Fill in call target
-            if i.mnemonic == "call" and self.state.symbol(int(i.op_str,16)) != None:
+            if i.mnemonic == "call" and is_int(i.op_str) and self.state.symbol(int(i.op_str,16)) != None:
                 comments.append(self.state.symbol(int(i.op_str,16)).name)
 
             if comments == []:
