@@ -112,6 +112,22 @@ class Loader(object):
 
         return None
 
+    def _lookup_obj_by_name(self, name):
+        """Returns an object for the given name. This is handy because sometimes we want 'libc.so.6' and sometimes we want 'libc-2.23.so' for example."""
+        
+        if os.path.basename(self.main_bin.filename) == name:
+            return self.main_bin
+
+        if name in self.shared_objects:
+            return self.shared_objects[name]
+
+        if name in [os.path.basename(self.shared_objects[obj].filename) for obj in self.shared_objects]:
+            return self.shared_objects[obj]
+
+        logger.warn("Unable to find object with name {0}".format(name))
+
+        return None
+
 
     def __repr__(self):
         return "<Loader arch={0} bits={1} endianness={2}>".format(self.main_bin.arch, self.main_bin.bits, self.main_bin.endianness)
@@ -150,5 +166,7 @@ from elftools.elf.elffile import ELFFile
 from elftools.elf.elffile import ELFError
 from larissa.Project import Project
 import larissa.Loader.ELF
+
+import os
 
 import triton

@@ -103,6 +103,15 @@ class Memory(PluginBase):
 
         self.__pages = pages
 
+    """
+    @property
+    def map(self):
+        " ""Returns a string representation of the memory map of this state."" "
+        
+        for base in sorted(state.posix.base_addrs):
+    """
+
+
 class Pages(object):
     """Silly abstraction for pages to allow pages to be created on the fly."""
     def __init__(self):

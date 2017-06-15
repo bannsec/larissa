@@ -63,7 +63,7 @@ class State(object):
             return symbol
 
         # If it's relocatable, need to update the address
-        if symbol.source in [os.path.basename(self.project.loader.shared_objects[name].filename) for name in self.project.loader.shared_objects] or self.project.loader.main_bin.address == 0:
+        if self.project.loader._lookup_obj_by_name(symbol.source).address == 0:
             symbol.addr += self.posix.base_addrs[symbol.source]
 
         return symbol
