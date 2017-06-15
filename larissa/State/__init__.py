@@ -15,39 +15,28 @@ class State(object):
             """Given an address, attempt to reverse look-up a symbol at that location."""
             
             # Find the base module
-            for base in sorted(self.posix.base_addrs):
-                if self.posix.base_addrs[base] < address:
-                    logger.debug("Found base for address {0} at {1}".format(address, base))
+            for name, base in sorted(self.posix.base_addrs.items(), key=operator.itemgetter(1),reverse=True):
+                if base < address:
+                    logger.debug("Found base for address {0} at {1} - {2}".format(address, base,name))
                     break
             else:
                 logger.error("Unable to find base for address {0}".format(address))
                 return
 
-            # Library
-            for shared_object in self.project.loader.shared_objects.values():
-                if os.path.basename(shared_object.filename) != base:
-                    continue
-
-                out = [shared_object.symbols[sym] for sym in shared_object.symbols if shared_object.symbols[sym].addr == address - self.posix.base_addrs[base]]
+            # PIE
+            obj = self.project.loader._lookup_obj_by_name(name)
+            if obj.address == 0:
+                out = [obj.symbols[sym] for sym in obj.symbols if obj.symbols[sym].addr == address - base]
 
                 if out == []:
                     return None
                 out = copy(out[0])
-                out.addr += self.posix.base_addrs[base]
+                out.addr += base
                 return out
 
-            # Main bin PIE
-            if self.project.loader.main_bin.address == 0:
-                out = [self.project.loader.main_bin.symbols[sym] for sym in self.project.loader.main_bin.symbols if self.project.loader.main_bin.symbols[sym].addr == address - self.posix.base_addrs[base]]
-                if out == []:
-                    return None
-                out = copy(out[0])
-                out.addr += self.posix.base_addrs[base]
-                return out
-
-            # Main bin non-PIE
+            # Non-PIE Main Binary
             else:
-                out = [self.project.loader.main_bin.symbols[sym] for sym in self.project.loader.main_bin.symbols if self.project.loader.main_bin.symbols[sym].addr == address]
+                out = [obj.symbols[sym] for sym in obj.symbols if obj.symbols[sym].addr == address]
                 if out == []:
                     return None
                 return copy(out[0])
@@ -122,6 +111,7 @@ from larissa.Project import Project
 from . import plugins
 import importlib
 from copy import copy
+import operator
 
 # Location of plugins
 plugins_dir = os.path.dirname(plugins.__file__)

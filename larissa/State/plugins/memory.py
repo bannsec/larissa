@@ -103,13 +103,34 @@ class Memory(PluginBase):
 
         self.__pages = pages
 
-    """
     @property
     def map(self):
-        " ""Returns a string representation of the memory map of this state."" "
+        """Prints a string representation of the memory map of this state."""
+
+        def roundup(x,base=4096):
+            return x if x % base == 0 else x + base - x % base
+
+        # Setup the table
+        table = prettytable.PrettyTable(["Start","End","Prot","File"])
+        table.align = 'l'
+        table.border = False
         
-        for base in sorted(state.posix.base_addrs):
-    """
+        for name, base in sorted(self.state.posix.base_addrs.items(), key=operator.itemgetter(1)):
+            # Grab the object
+            obj = self.state.project.loader._lookup_obj_by_name(name)
+
+            # Loop through the segments
+            for seg in self.state.project.loader.main_bin.segments:
+                if seg['p_type'] != "PT_LOAD":
+                    continue
+
+                map_base = base
+                start = map_base + seg['p_vaddr']
+                end = start + seg['p_memsz']
+
+                table.add_row([hex(start), hex(end), self[start].page.prot_str, obj.filename])
+
+        print(str(table))
 
 
 class Pages(object):
@@ -166,15 +187,15 @@ class Page(object):
         """String representation of the protection for this page."""
         prot = ""
         if self.read:
-            prot += "R"
+            prot += "r"
         else:
             prot += "-"
         if self.write:
-            prot += "W"
+            prot += "w"
         else:
             prot += "-"
         if self.execute:
-            prot += "X"
+            prot += "x"
         else:
             prot += "-"
         return prot
@@ -258,3 +279,5 @@ class Page(object):
         self.__mapped = mapped
 
 import triton
+import prettytable
+import operator

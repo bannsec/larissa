@@ -224,7 +224,7 @@ setup(
     extras_require={
         'dev': ['six','ipython<6','twine','pytest','python-coveralls','coverage','pytest-cov','pytest-xdist'],
     },
-    install_requires=["pyelftools"],
+    install_requires=["pyelftools","prettytable"],
     keywords='symbolic execution triton',
     packages=find_packages(exclude=['contrib', 'docs', 'tests','lib']),
     cmdclass={
