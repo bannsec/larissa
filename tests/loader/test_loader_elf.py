@@ -47,3 +47,13 @@ def test_loader_triton_elf():
             # Shared libs
             for lib in proj.loader.shared_objects.values():
                 lib.triton_elf.getSize()
+
+def test_loader_mmap_base_not_mapped():
+    # Make sure we have adjusted mmap base from loading
+    for arch in ["amd64","ia32"]:
+        for binary in ["simple_pic_pie","simple_nopic_nopie"]:
+            print("Loading {0} {1}".format(arch, binary))
+            proj = larissa.Project(os.path.join(bin_path,arch,binary))
+            state = proj.factory.entry_state()
+            assert state.memory[state.libc.mmap_base].page.mapped == False
+            
