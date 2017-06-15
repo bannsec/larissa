@@ -86,18 +86,6 @@ class Memory(PluginBase):
 
         self.store(key, value)
 
-    @property
-    def pages(self):
-        return self.__pages
-
-    @pages.setter
-    def pages(self, pages):
-        if type(pages) is not Pages:
-            logger.error("Attempting to set pages to invalid type of {0}".format(type(pages)))
-            return
-
-        self.__pages = pages
-
     ############
     # Property #
     ############
