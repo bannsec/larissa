@@ -140,6 +140,9 @@ class Pages(object):
     def __len__(self):
         return len(self.pages)
 
+    def __iter__(self):
+        return self.pages.__iter__()
+
     def __repr__(self):
         return "<Pages {0}>".format(len(self.pages))
 

@@ -191,3 +191,8 @@ def test_memory_store_bytes_symbolic():
     state.memory[0] = b
     for i in range(32):
         assert str(b[i]) in str(state.memory[i])
+
+def test_memory_pages_iterator():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    list(state.memory.pages)
