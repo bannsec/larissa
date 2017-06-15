@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger("larissa.State")
 
 class State(object):
 
@@ -6,7 +8,50 @@ class State(object):
         self._populate_plugins()
 
     def symbol(self, name):
-        """Lookup symbol by name, return with address adjusted for loaded base."""
+        """Lookup symbol by name, return with address adjusted for loaded base.
+        If given integer instead of string, attempt reverse lookup of what symbol is at that address."""
+
+        def symbol_by_address(self, address):
+            """Given an address, attempt to reverse look-up a symbol at that location."""
+            
+            # Find the base module
+            for base in sorted(self.posix.base_addrs):
+                if self.posix.base_addrs[base] < address:
+                    logger.debug("Found base for address {0} at {1}".format(address, base))
+                    break
+            else:
+                logger.error("Unable to find base for address {0}".format(address))
+                return
+
+            # Library
+            if base in self.project.loader.shared_objects:
+                out = [self.project.loader.shared_objects[base].symbols[sym] for sym in self.project.loader.shared_objects[base].symbols if self.project.loader.main_bin.symbols[sym].addr == address - self.posix.base_addrs[base]]
+                if out == []:
+                    return None
+                out = copy(out[0])
+                out.addr += self.posix.base_addrs[base]
+                return out
+
+            # Main bin PIE
+            if self.project.loader.main_bin.address == 0:
+                out = [self.project.loader.main_bin.symbols[sym] for sym in self.project.loader.main_bin.symbols if self.project.loader.main_bin.symbols[sym].addr == address - self.posix.base_addrs[base]]
+                if out == []:
+                    return None
+                out = copy(out[0])
+                out.addr += self.posix.base_addrs[base]
+                return out
+
+            # Main bin non-PIE
+            else:
+                out = [self.project.loader.main_bin.symbols[sym] for sym in self.project.loader.main_bin.symbols if self.project.loader.main_bin.symbols[sym].addr == address]
+                if out == []:
+                    return None
+                return copy(out[0])
+
+        # Reverse lookup
+        if type(name) in [int, long]:
+            return symbol_by_address(self, name)
+
         symbol = copy(self.project.loader.main_bin.symbols[name])
 
         if symbol == None:

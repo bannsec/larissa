@@ -12,7 +12,19 @@ class Disasm(PluginBase):
     def pp(self, s):
         """Pretty prints the disassembly of the string/Byte/Bytes."""
         for i in self.disasm(s):
-            print("0x%x:\t%s\t%s" %(i.address, i.mnemonic, i.op_str))
+            # Add in helpful comments where possible
+            comments = []
+
+            # Fill in call target
+            if i.mnemonic == "call" and self.state.symbol(int(i.op_str,16)) != None:
+                comments.append(self.state.symbol(int(i.op_str,16)).name)
+
+            if comments == []:
+                comments = ""
+            else:
+                comments = " ; " + ', '.join(comments)
+
+            print("0x%x:\t%s\t%s" %(i.address, i.mnemonic, i.op_str + comments))
 
     def disasm(self, s):
         """Returns a disassembly module for the given input of type str/Byte/Bytes."""

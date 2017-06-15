@@ -49,3 +49,16 @@ def test_state_symbol():
 
     # Bug where the actual symbol was being updated...
     assert main.addr == state.symbol('main').addr
+
+def test_state_reverse_symbol():
+    for arch in ["amd64","ia32"]:
+        for binary in ["simple_pic_pie","simple_nopic_nopie"]:
+            proj = larissa.Project(os.path.join(bin_path,arch,binary))
+            state = proj.factory.entry_state()
+            main = state.symbol('main')
+            resolved = state.symbol(main.addr)
+            assert resolved.name == "main"
+            assert resolved.addr == main.addr
+            assert resolved.source == binary
+
+    # TODO: Create test for shared_library reverse symbol resolution

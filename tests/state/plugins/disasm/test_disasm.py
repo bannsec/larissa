@@ -20,3 +20,14 @@ def test_disasm_basic():
     b.disasm()
     b.pp()
 
+def test_disasm_call_symbol_resolution(capsys):
+    for arch in ["amd64","ia32"]:
+        for binary in ["simple_pic_pie","simple_nopic_nopie"]:
+            tmp = ""
+            proj = larissa.Project(os.path.join(bin_path,arch,binary))
+            state = proj.factory.entry_state()
+            main = state.symbol('main')
+            b = state.memory[main.addr:main.addr+32]
+            b.pp()
+            out, err = capsys.readouterr()
+            assert "print_hello" in out
