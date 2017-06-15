@@ -23,23 +23,26 @@ class State(object):
                 logger.error("Unable to find base for address {0}".format(address))
                 return
 
-            # PIE
             obj = self.project.loader._lookup_obj_by_name(name)
+
+            # PIE
             if obj.address == 0:
                 out = [obj.symbols[sym] for sym in obj.symbols if obj.symbols[sym].addr == address - base]
-
-                if out == []:
-                    return None
-                out = copy(out[0])
-                out.addr += base
-                return out
-
-            # Non-PIE Main Binary
             else:
                 out = [obj.symbols[sym] for sym in obj.symbols if obj.symbols[sym].addr == address]
-                if out == []:
-                    return None
-                return copy(out[0])
+
+            # Didn't find it
+            if out == []:
+                return None
+
+            out = copy(out[0])
+
+            # Adjust for PIE base
+            if obj.address == 0:
+                out.addr += base
+
+            return out
+
 
         # Reverse lookup
         if type(name) in [int, long]:
