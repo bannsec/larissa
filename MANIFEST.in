@@ -1,5 +1,6 @@
 recursive-include lib *
 global-exclude *.swp *.pyc
+include version.py Dockerfile
 #include *
 #prune larissa.egg-info
 #prune dist
