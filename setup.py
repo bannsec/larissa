@@ -8,7 +8,6 @@ import tempfile
 import shutil
 import urllib2
 import tarfile
-from glob import glob
 import multiprocessing
 import subprocess
 import re
@@ -100,7 +99,8 @@ def _install_boost():
         # No idea why setup.py correctly installs larissa_boost in this case where pip does not.
         os.system("pip download larissa_boost")
         os.system("tar xf larissa_boost*")
-        os.chdir(glob("larissa_boost-*")[0])
+        _, names, _ = next(os.walk("."))
+        os.chdir([name for name in names if "larissa_boost" in name][0])
         out = subprocess.check_output("python setup.py install",shell=True)
     except Exception as e:
         raise Exception(e.output)
