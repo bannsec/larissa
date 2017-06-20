@@ -166,6 +166,73 @@ class ELF(Loader):
         while state.memory[state.libc.mmap_base].page.mapped:
             state.libc.mmap_base += state.memory._page_size
 
+    def _relocate_normalize_addr(self, state, addr):
+        """Takes in state object and address, and returns adjusted address. For instance, if this is a non-PIE binary with base address, no change. If this is PIE, adjust the offset to the real address."""
+
+        # Do we have a base addr?
+        if self.address != 0:
+            if state.posix.base_addrs[os.path.basename(self.filename)] != self.address:
+                logger.error("Binary {0} was loaded at non-requested base. I don't have this handled yet.".format(self.filename))
+                return
+
+            # We've loaded it as requested, this address should be right
+            return addr
+
+        return addr + state.posix.base_addrs[os.path.basename(self.filename)]
+
+
+    def _relocate_x64(self, state, rel, name):
+        """Handle relocating a specific relocation entry for x64"""
+        desc = describe_reloc_type(rel['r_info_type'],self.elffile)
+        address = self._relocate_normalize_addr(state, rel['r_offset'])
+        addend = rel['r_addend']
+        rela = rel.is_RELA()
+
+        if desc in ["R_X86_64_GLOB_DAT","R_X86_64_JUMP_SLOT"]:
+            # Attempt to find the symbol
+            resolved = state.symbol(name)
+            if resolved is not None:
+                print(resolved.addr)
+            resolved_address = 0 if resolved == None else resolved.addr
+            # Store the result
+            b = state.se.Bytes(length=8,value=resolved_address)
+            state.memory[address] = b
+            return
+        
+        logger.error("Unhandled relocation type of {0} for symbol {1} in {2}".format(desc, name, self.filename))
+
+    def _relocate_x86(self, state, rel, name):
+        """Handle relocating a specific relocation entry for x86"""
+        desc = describe_reloc_type(rel['r_info_type'],self.elffile)
+        address = self._relocate_normalize_addr(state, rel['r_offset'])
+        
+        logger.error("Unhandled relocation type of {0} for symbol {1} in {2}".format(desc, name, self.filename))
+
+    def perform_relocations(self, state):
+        """Performs the relocations needed for this elf. This assumes the elf and libraries have been loaded."""
+
+        # Figure our appropriate relocation function
+        if self.arch == "x64":
+            relocate = self._relocate_x64
+        elif self.arch == "x86":
+            relocate = self._relocate_x86
+        else:
+            logger.error("Unknown arch type for relocation.")
+            return
+
+        # Loop through relocation sections
+        for rel_sec in self.elffile.iter_sections():
+            if type(rel_sec) is not RelocationSection:
+                continue
+
+            # Grab the symbol table
+            symtab = self.elffile.get_section(rel_sec['sh_link'])
+
+            # Loop through all relocations in this table
+            for rel in rel_sec.iter_relocations():
+                # Call the relocation method
+                relocate(state, rel, symtab.get_symbol(rel['r_info_sym']).name)
+
 
     def section(self, section):
         """Returns the section object for the given section name or number or None if not found."""
@@ -454,6 +521,7 @@ from elftools.elf.sections import SymbolTableSection
 from elftools.elf.relocation import RelocationSection
 from elftools.elf.descriptions import describe_e_type
 from elftools.elf.descriptions import describe_ei_osabi
+from elftools.elf.descriptions import describe_reloc_type
 from larissa.Project import Project
 from larissa.Loader.Symbol import Symbol
 import triton

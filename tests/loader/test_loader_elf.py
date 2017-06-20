@@ -57,3 +57,10 @@ def test_loader_mmap_base_not_mapped():
             state = proj.factory.entry_state()
             assert state.memory[state.libc.mmap_base].page.mapped == False
             
+def test_loader_reloc_64_nopic_nopie_R_X86_64_JUMP_SLOT():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    b = state.memory[0x601018:0x601018+8]
+    printf = state.symbol('printf')
+    # Test it was relocated correctly
+    assert int(b) == printf.addr
