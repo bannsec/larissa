@@ -112,6 +112,9 @@ class Bytes(object):
 
         return out
 
+    def __hex__(self):
+        return hex(int(self))
+
     def pp(self):
         """Pretty prints this bytes object as assembly instructions."""
         self.state.disasm.pp(self)

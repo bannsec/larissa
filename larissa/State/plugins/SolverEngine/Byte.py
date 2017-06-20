@@ -89,6 +89,9 @@ class Byte(object):
         # Symbolic
         return self.state.se.any_int(self)
 
+    def __hex__(self):
+        return hex(int(self))
+
     def __len__(self):
         return 1
         

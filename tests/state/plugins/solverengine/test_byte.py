@@ -116,3 +116,8 @@ def test_solverengine_byte_page_attr():
     b = state.se.Byte()
     assert b.page == None
 
+def test_solverengine_byte_overload_hex():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    b = state.se.Byte(value=0x26)
+    assert hex(b) == "0x26"

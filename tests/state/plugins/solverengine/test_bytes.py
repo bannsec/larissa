@@ -117,3 +117,9 @@ def test_solverengine_bytes_invalid_value_too_big():
     state = proj.factory.entry_state()
     b = state.se.Bytes(length=4,value=0xffffffffff)
     assert int(b) == 0
+
+def test_solverengine_bytes_overload_hex():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    b = state.se.Bytes(length=16,value=0x123456)
+    assert hex(b) == "0x123456"
