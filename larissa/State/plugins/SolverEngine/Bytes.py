@@ -3,11 +3,12 @@ logger = logging.getLogger("larissa.State.plugins.SolverEngine.Bytes")
 
 class Bytes(object):
 
-    def __init__(self, state, address=None, length=1, symbolic = False, *args, **kwargs):
+    def __init__(self, state, address=None, length=1, symbolic = False, value = None, *args, **kwargs):
         """
         address = address to read bytes from (optional)
         length = number of bytes to read
         symbolic = Should it be symbolic? (exclusive from address)
+        value = (optional) int value to store in this bytes object.
         """
 
         self.state = state
@@ -16,8 +17,12 @@ class Bytes(object):
         self.bytes = []
 
         # These two are mutually exclusive for now
-        if address and symbolic:
+        if address != None and symbolic:
             logger.error("Cannot specify both address and symbolic for now.")
+            return
+
+        if address != None and value != None:
+            logger.error("Cannot specify both address to load from and value.")
             return
 
         self.length = length
@@ -28,11 +33,30 @@ class Bytes(object):
                 # Just keep adding
                 self.bytes.append(self.state.se.Byte(symbolic=True))
 
+        if value != None:
+            self._store_value(value)
+
+    def _store_value(self, value):
+        if type(value) not in [int, long]:
+            logger.error("Invalid Bytes value type of {0}".format(type(value)))
+            return
+
+        # Int
+        bits = len(bin(value)[2:].strip("L"))
+        if bits > self.length*8:
+            logger.error("Attempting to store value {0} into bytes object of max size {1}".format(hex(value), hex(2**(self.length*8)-1)))
+            return
+
+        # TODO: This probably won't work right on Big Endian.
+        for _ in xrange(self.length):
+            self.bytes.append(self.state.se.Byte(value=value & 0xff))
+            value = value >> 8
 
     def _load_from_memory(self):
         """Loads up our bytes."""
 
         # Heavy lifting is done at the Byte object here
+        # TODO: This probably won't work right on Big Endian.
         for address in xrange(self.address, self.address+self.length):
             self.bytes.append(self.state.se.Byte(address))
 

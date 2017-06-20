@@ -94,3 +94,26 @@ def test_solverengine_bytes_state_badsetter():
     with pytest.raises(Exception):
         b.state = "blerg"
 
+def test_solverengine_bytes_initial_value():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    b = state.se.Bytes(length=16,value=0x12345678)
+    assert int(b) == 0x12345678
+
+def test_solverengine_bytes_initial_value_and_address():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    b = state.se.Bytes(length=16,value=0x12345678,address=0x1234)
+    assert not hasattr(b,"length")
+
+def test_solverengine_bytes_invalid_value():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    b = state.se.Bytes(length=16,value=12.5)
+    assert int(b) == 0
+
+def test_solverengine_bytes_invalid_value_too_big():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    b = state.se.Bytes(length=4,value=0xffffffffff)
+    assert int(b) == 0
