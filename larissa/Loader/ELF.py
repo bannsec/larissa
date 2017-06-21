@@ -219,13 +219,14 @@ class ELF(Loader):
 
             # Loop through all relocations in this table
             for rel in rel_sec.iter_relocations():
-                if rel.is_RELA():
-                    logger.error("I haven't added RELA support yet!")
-                    continue
-
                 desc = describe_reloc_type(rel['r_info_type'],self.elffile)
                 address = self._relocate_normalize_addr(state, rel['r_offset'])
                 name = symtab.get_symbol(rel['r_info_sym']).name
+                # Resolving addend
+                if rel.is_RELA():
+                    addend = addend = state.se.Bytes(rel['r_addend'],length=self.bits/8)
+                else:
+                    addend = state.memory[address:address+(self.bits/8)]
 
                 if desc in ["R_386_GLOB_DAT", "R_386_JUMP_SLOT","R_X86_64_GLOB_DAT","R_X86_64_JUMP_SLOT"]:
                     # Attempt to find the symbol
@@ -238,11 +239,8 @@ class ELF(Loader):
                     state.memory[address] = b
 
                 elif desc in ["R_386_RELATIVE","R_X86_64_RELATIVE"]:
-                    print(rel.is_RELA())
-                    # Get the value at the offset
-                    b = state.memory[address:address+(self.bits/8)]
                     # Adjust it to where the library was loaded
-                    b = state.se.Bytes(value=int(b)+state.posix.base_addrs[os.path.basename(self.filename)], length=self.bits/8)
+                    b = state.se.Bytes(value=int(addend)+state.posix.base_addrs[os.path.basename(self.filename)], length=self.bits/8)
                     # Store it back
                     state.memory[address] = b
 
