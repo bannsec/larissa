@@ -123,3 +123,15 @@ def test_solverengine_bytes_overload_hex():
     state = proj.factory.entry_state()
     b = state.se.Bytes(length=16,value=0x123456)
     assert hex(b) == "0x123456"
+
+def test_solverengine_bytes_zero_string():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    b = state.se.Bytes(length=16,value=0)
+    assert str(b) == "\x00"*16
+
+def test_solverengine_bytes_long_addr():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    b = state.memory[0x0040053cL: 0x0040053cL + 5]
+    assert str(b) == "UH\x89\xe5H"
