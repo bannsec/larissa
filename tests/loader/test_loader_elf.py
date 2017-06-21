@@ -64,3 +64,11 @@ def test_loader_reloc_64_nopic_nopie_R_X86_64_JUMP_SLOT():
     printf = state.symbol('printf')
     # Test it was relocated correctly
     assert int(b) == printf.addr
+
+def test_loader_reloc_32_nopic_nopie_R_X86_64_JUMP_SLOT():
+    proj = larissa.Project(os.path.join(bin_path,"ia32","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    b = state.memory[0x804A00C:0x804A00C+4]
+    printf = state.symbol('printf')
+    # Test it was relocated correctly
+    assert int(b) == printf.addr

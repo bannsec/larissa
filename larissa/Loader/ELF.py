@@ -191,8 +191,8 @@ class ELF(Loader):
         if desc in ["R_X86_64_GLOB_DAT","R_X86_64_JUMP_SLOT"]:
             # Attempt to find the symbol
             resolved = state.symbol(name)
-            if resolved is not None:
-                print(resolved.addr)
+            if resolved is None:
+                logger.warn("Unable to resolve address for symbol {0}".format(name))
             resolved_address = 0 if resolved == None else resolved.addr
             # Store the result
             b = state.se.Bytes(length=8,value=resolved_address)
@@ -205,6 +205,17 @@ class ELF(Loader):
         """Handle relocating a specific relocation entry for x86"""
         desc = describe_reloc_type(rel['r_info_type'],self.elffile)
         address = self._relocate_normalize_addr(state, rel['r_offset'])
+
+        if desc in ["R_386_GLOB_DAT", "R_386_JUMP_SLOT"]:
+            # Attempt to find the symbol
+            resolved = state.symbol(name)
+            if resolved is None:
+                logger.warn("Unable to resolve address for symbol {0}".format(name))
+            resolved_address = 0 if resolved == None else resolved.addr
+            # Store the result
+            b = state.se.Bytes(length=4,value=resolved_address)
+            state.memory[address] = b
+            return
         
         logger.error("Unhandled relocation type of {0} for symbol {1} in {2}".format(desc, name, self.filename))
 
