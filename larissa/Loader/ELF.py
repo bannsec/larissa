@@ -188,17 +188,6 @@ class ELF(Loader):
         addend = rel['r_addend']
         rela = rel.is_RELA()
 
-        if desc in ["R_X86_64_GLOB_DAT","R_X86_64_JUMP_SLOT"]:
-            # Attempt to find the symbol
-            resolved = state.symbol(name)
-            if resolved is None:
-                logger.warn("Unable to resolve address for symbol {0}".format(name))
-            resolved_address = 0 if resolved == None else resolved.addr
-            # Store the result
-            b = state.se.Bytes(length=8,value=resolved_address)
-            state.memory[address] = b
-            return
-        
         logger.error("Unhandled relocation type of {0} for symbol {1} in {2}".format(desc, name, self.filename))
 
     def _relocate_x86(self, state, rel, name):
@@ -206,17 +195,6 @@ class ELF(Loader):
         desc = describe_reloc_type(rel['r_info_type'],self.elffile)
         address = self._relocate_normalize_addr(state, rel['r_offset'])
 
-        if desc in ["R_386_GLOB_DAT", "R_386_JUMP_SLOT"]:
-            # Attempt to find the symbol
-            resolved = state.symbol(name)
-            if resolved is None:
-                logger.warn("Unable to resolve address for symbol {0}".format(name))
-            resolved_address = 0 if resolved == None else resolved.addr
-            # Store the result
-            b = state.se.Bytes(length=4,value=resolved_address)
-            state.memory[address] = b
-            return
-        
         logger.error("Unhandled relocation type of {0} for symbol {1} in {2}".format(desc, name, self.filename))
 
     def perform_relocations(self, state):
@@ -241,8 +219,23 @@ class ELF(Loader):
 
             # Loop through all relocations in this table
             for rel in rel_sec.iter_relocations():
-                # Call the relocation method
-                relocate(state, rel, symtab.get_symbol(rel['r_info_sym']).name)
+                desc = describe_reloc_type(rel['r_info_type'],self.elffile)
+                address = self._relocate_normalize_addr(state, rel['r_offset'])
+                name = symtab.get_symbol(rel['r_info_sym']).name
+
+                if desc in ["R_386_GLOB_DAT", "R_386_JUMP_SLOT","R_X86_64_GLOB_DAT","R_X86_64_JUMP_SLOT"]:
+                    # Attempt to find the symbol
+                    resolved = state.symbol(name)
+                    if resolved is None:
+                        logger.warn("Unable to resolve address for symbol {0}".format(name))
+                    resolved_address = 0 if resolved == None else resolved.addr
+                    # Store the result
+                    b = state.se.Bytes(length=self.bits/8,value=resolved_address)
+                    state.memory[address] = b
+
+                else:
+                    # Call the architecture specific relocation
+                    relocate(state, rel, name)
 
 
     def section(self, section):
