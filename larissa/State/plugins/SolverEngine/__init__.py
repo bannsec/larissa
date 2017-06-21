@@ -166,8 +166,8 @@ class SolverEngine(PluginBase):
             #val = hex(val)[2:].strip("L")
 
             # make sure hex is padded right
-            #if len(val) % 2 != 0:
-            #    val = "0" + val
+            if len(val) % 2 != 0:
+                val = "0" + val
 
             # hex to str
             val = unhexlify(val)

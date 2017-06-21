@@ -188,14 +188,14 @@ class ELF(Loader):
         addend = rel['r_addend']
         rela = rel.is_RELA()
 
-        logger.error("Unhandled relocation type of {0} for symbol {1} in {2}".format(desc, name, self.filename))
+        logger.error("Unhandled relocation type of {0} for symbol {1} in {2} at 0x{3:x}".format(desc, name, self.filename, address))
 
     def _relocate_x86(self, state, rel, name):
         """Handle relocating a specific relocation entry for x86"""
         desc = describe_reloc_type(rel['r_info_type'],self.elffile)
         address = self._relocate_normalize_addr(state, rel['r_offset'])
 
-        logger.error("Unhandled relocation type of {0} for symbol {1} in {2}".format(desc, name, self.filename))
+        logger.error("Unhandled relocation type of {0} for symbol {1} in {2} at 0x{3:x}".format(desc, name, self.filename, address))
 
     def perform_relocations(self, state):
         """Performs the relocations needed for this elf. This assumes the elf and libraries have been loaded."""
@@ -231,6 +231,14 @@ class ELF(Loader):
                     resolved_address = 0 if resolved == None else resolved.addr
                     # Store the result
                     b = state.se.Bytes(length=self.bits/8,value=resolved_address)
+                    state.memory[address] = b
+
+                elif desc in ["R_386_RELATIVE","R_X86_64_RELATIVE"]:
+                    # Get the value at the offset
+                    b = state.memory[address:address+(self.bits/8)]
+                    # Adjust it to where the library was loaded
+                    b = state.se.Bytes(value=int(b)+state.posix.base_addrs[os.path.basename(self.filename)], length=self.bits/8)
+                    # Store it back
                     state.memory[address] = b
 
                 else:

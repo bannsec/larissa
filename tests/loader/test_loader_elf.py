@@ -72,3 +72,11 @@ def test_loader_reloc_32_nopic_nopie_R_X86_64_JUMP_SLOT():
     printf = state.symbol('printf')
     # Test it was relocated correctly
     assert int(b) == printf.addr
+
+def test_loader_reloc_32_nopic_pie_R_386_RELATIVE():
+    proj = larissa.Project(os.path.join(bin_path,"ia32","simple_nopic_pie"))
+    state = proj.factory.entry_state()
+    base_addr = state.posix.base_addrs[os.path.basename(proj.loader.main_bin.filename)]
+    b = int(state.memory[base_addr+0x60a:base_addr+0x60a+4])
+    string = state.memory[b:b+12]
+    assert str(string) == "Hello World!"
