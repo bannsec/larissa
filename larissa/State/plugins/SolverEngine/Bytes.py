@@ -170,7 +170,7 @@ class Bytes(object):
 
     @address.setter
     def address(self, address):
-        if type(address) not in [int, type(None)]:
+        if type(address) not in [int, long, type(None)]:
             logger.error("Invalid type for address of {0}".format(type(address)))
             return
 
