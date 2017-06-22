@@ -202,9 +202,9 @@ class ELF(Loader):
         # https://docs.oracle.com/cd/E19120-01/open.solaris/819-0690/chapter6-26/index.html
         # https://docs.oracle.com/cd/E23824_01/html/819-0690/chapter6-54839.html
 
-        def _resolve_symbol_address(state, name):
+        def _resolve_symbol_address(state, name, exclude=None):
             # Attempt to find the symbol
-            resolved = state.symbol(name)
+            resolved = state.symbol(name, exclude=exclude)
             if resolved is None:
                 logger.warn("Unable to resolve address for symbol {0}".format(name))
             resolved_address = 0 if resolved == None else resolved.addr
@@ -278,6 +278,14 @@ class ELF(Loader):
                 elif desc in ["R_386_TLS_TPOFF", "R_X86_64_TPOFF64", "R_X86_64_DTPMOD64", "R_X86_64_DTPOFF64"]:
                     # http://git.yoctoproject.org/cgit/cgit.cgi/prelink-cross/plain/trunk/src/arch-i386.c?h=cross_prelink_r174
                     logger.info("Ignoring Thread Local Storage relocation.")
+
+                """
+                # Copy will need to wait until everything is loaded....
+                elif desc in ["R_386_COPY"]:
+                    S = _resolve_symbol_address(state, name, exclude=[os.path.basename(self.filename)])
+                    S = state.memory[int(S):int(S) + (self.bits/8)]
+                    state.memory[address] = S
+                """
 
                 else:
                     # Call the architecture specific relocation
