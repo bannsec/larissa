@@ -268,6 +268,13 @@ class ELF(Loader):
                     # Store it
                     state.memory[address] = b
 
+                elif desc in ["R_X86_64_64"]:
+                    S = _resolve_symbol_address(state, name)
+                    # Calculate value
+                    b = state.se.Bytes(value=int(S) + A, length=self.bits/8)
+                    # Store it
+                    state.memory[address] = b
+
                 else:
                     # Call the architecture specific relocation
                     relocate(state, rel, name)
