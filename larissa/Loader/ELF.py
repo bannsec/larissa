@@ -268,10 +268,10 @@ class ELF(Loader):
                     # Store it
                     state.memory[address] = b
 
-                elif desc in ["R_X86_64_64"]:
+                elif desc in ["R_X86_64_64","R_386_32"]:
                     S = _resolve_symbol_address(state, name)
                     # Calculate value
-                    b = state.se.Bytes(value=int(S) + A, length=self.bits/8)
+                    b = state.se.Bytes(value=int(S) + A, length=int(desc.split("_")[-1])/8)
                     # Store it
                     state.memory[address] = b
 
