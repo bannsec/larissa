@@ -87,12 +87,16 @@ class Loader(object):
 
             # TODO: Support PE
 
-    def symbol(self, symbol, first=None):
+    def symbol(self, symbol, first=None, exclude=None):
         """Input symbol string to resolve. Return first resolution of symbol as larissa class object.
 
         first == optional string argument of library name to lookup symbols in first. This is for objects loaded with DF_SYMBOLIC. If not given, normal loading preference is used.
+        exclude == (optional) list of binary names to exclude from search. i.e.: ['libc-2.23.so']
         
         Returns None if the symbol could not be resolved."""
+
+        # Default to empty list
+        exclude = exclude or []
 
         # Check for first
         if first is not None:
@@ -100,11 +104,15 @@ class Loader(object):
                 return self.shared_objects[first].symbols[symbol]
 
         # Check main object
-        if symbol in self.main_bin.symbols and self.main_bin.symbols[symbol].addr != None:
+        if os.path.basename(self.main_bin.filename) not in exclude and symbol in self.main_bin.symbols and self.main_bin.symbols[symbol].addr != None:
             return self.main_bin.symbols[symbol]
 
         # Check all loaded shared objects
         for name in self.shared_objects:
+            # Ignoring anything in exclude
+            if name in exclude:
+                continue
+
             object = self.shared_objects[name]
 
             if symbol in object.symbols and object.symbols[symbol].addr != None:

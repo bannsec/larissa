@@ -64,3 +64,9 @@ def test_state_reverse_symbol():
             assert resolved.addr == printf.addr
             assert "libc" in resolved.source
 
+
+def test_state_symbol_copy_exclude():
+    proj = larissa.Project(os.path.join(bin_path,"ia32","reloc_copy_nopic_nopie"))
+    state = proj.factory.entry_state()
+    assert state.symbol('stdout').source == "reloc_copy_nopic_nopie"
+    assert "libc" in state.symbol('stdout',exclude=['reloc_copy_nopic_nopie']).source

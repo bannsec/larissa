@@ -7,9 +7,10 @@ class State(object):
         self.project = project
         self._populate_plugins()
 
-    def symbol(self, name):
+    def symbol(self, name, exclude=None):
         """Lookup symbol by name, return with address adjusted for loaded base.
-        If given integer instead of string, attempt reverse lookup of what symbol is at that address."""
+        If given integer instead of string, attempt reverse lookup of what symbol is at that address.
+        optional exclude == list of file names to exclude from search. for instance ['libc-2.23.so']"""
 
         def symbol_by_address(self, address):
             """Given an address, attempt to reverse look-up a symbol at that location."""
@@ -49,7 +50,7 @@ class State(object):
             return symbol_by_address(self, name)
 
         # Normal lookup
-        symbol = copy(self.project.loader.symbol(name))
+        symbol = copy(self.project.loader.symbol(name,exclude=exclude))
 
         if symbol == None:
             return symbol
