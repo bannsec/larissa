@@ -275,7 +275,7 @@ class ELF(Loader):
                     # Store it
                     state.memory[address] = b
 
-                elif desc in ["R_386_TLS_TPOFF"]:
+                elif desc in ["R_386_TLS_TPOFF", "R_X86_64_TPOFF64"]:
                     # http://git.yoctoproject.org/cgit/cgit.cgi/prelink-cross/plain/trunk/src/arch-i386.c?h=cross_prelink_r174
                     logger.info("Ignoring TLS_TPOFF relocation.")
 
