@@ -517,38 +517,6 @@ class ELF(Loader):
 
                 # Add it to the dict
                 symbols[symbol_name] = symbol_obj
-
-        """
-        # Iterate through relocations to give symbols addresses if possible
-        for section in self.elffile.iter_sections():
-
-            # Looking at relocations
-            if type(section) is not RelocationSection:
-                continue
-
-            symtable = self.elffile.section(section['sh_link'])
-
-            # Loop through this relocation section
-            for rel in section.iter_relocations():
-
-                # What's the symbol
-                symbol = symtable.get_symbol(rel['r_info_sym'])
-
-                # Resolve it
-                symbol_name = symbol_resolve(self, symbol)
-
-                # If lookup failed
-                if symbol_name is None:
-                    continue
-
-                # Sanity check
-                if symbols[symbol_name].addr is not None:
-                    logger.info("Found symbol {2} already. Old = {0}, New = {1} ... Ignoring and leaving old in place.".format(symbols[symbol_name].addr, rel['r_offset'], symbol_name))
-                    continue
-
-                # Add known address
-                symbols[symbol_name].addr = rel['r_offset']
-        """
         
         # Cache our work
         self.__symbols = symbols
