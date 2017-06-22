@@ -200,6 +200,14 @@ class ELF(Loader):
     def perform_relocations(self, state):
         """Performs the relocations needed for this elf. This assumes the elf and libraries have been loaded."""
 
+        def _resolve_symbol(state, name):
+            # Attempt to find the symbol
+            resolved = state.symbol(name)
+            if resolved is None:
+                logger.warn("Unable to resolve address for symbol {0}".format(name))
+            resolved_address = 0 if resolved == None else resolved.addr
+            return resolved_address
+
         # Figure our appropriate relocation function
         if self.arch == "x64":
             relocate = self._relocate_x64
@@ -228,12 +236,11 @@ class ELF(Loader):
                 else:
                     addend = state.memory[address:address+(self.bits/8)]
 
+                logger.debug("Attempting to relocate \"{0}\" at {1} type {2}: {3}".format(name, hex(address), desc, rel))
+
                 if desc in ["R_386_GLOB_DAT", "R_386_JUMP_SLOT","R_X86_64_GLOB_DAT","R_X86_64_JUMP_SLOT"]:
                     # Attempt to find the symbol
-                    resolved = state.symbol(name)
-                    if resolved is None:
-                        logger.warn("Unable to resolve address for symbol {0}".format(name))
-                    resolved_address = 0 if resolved == None else resolved.addr
+                    resolved_address = _resolve_symbol(state, name)
                     # Store the result
                     b = state.se.Bytes(length=self.bits/8,value=resolved_address)
                     state.memory[address] = b
