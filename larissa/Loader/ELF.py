@@ -199,8 +199,10 @@ class ELF(Loader):
 
     def perform_relocations(self, state):
         """Performs the relocations needed for this elf. This assumes the elf and libraries have been loaded."""
+        # https://docs.oracle.com/cd/E19120-01/open.solaris/819-0690/chapter6-26/index.html
+        # https://docs.oracle.com/cd/E23824_01/html/819-0690/chapter6-54839.html
 
-        def _resolve_symbol(state, name):
+        def _resolve_symbol_address(state, name):
             # Attempt to find the symbol
             resolved = state.symbol(name)
             if resolved is None:
@@ -229,26 +231,41 @@ class ELF(Loader):
             for rel in rel_sec.iter_relocations():
                 desc = describe_reloc_type(rel['r_info_type'],self.elffile)
                 address = self._relocate_normalize_addr(state, rel['r_offset'])
+                P = address
                 name = symtab.get_symbol(rel['r_info_sym']).name
                 # Resolving addend
                 if rel.is_RELA():
-                    addend = addend = state.se.Bytes(rel['r_addend'],length=self.bits/8)
+                    A = state.se.Bytes(rel['r_addend'],length=self.bits/8)
                 else:
-                    addend = state.memory[address:address+(self.bits/8)]
+                    A = state.memory[address:address+(self.bits/8)]
+
+                # Need to change A to signed value
+                if self.bits == 32:
+                    A = ctypes.c_int32(int(A)).value
+                elif self.bits == 64:
+                    A = ctypes.c_int64(int(A)).value
+                else:
+                    logger.error("Unhandled bits of {0}".format(self.bits))
 
                 logger.debug("Attempting to relocate \"{0}\" at {1} type {2}: {3}".format(name, hex(address), desc, rel))
 
                 if desc in ["R_386_GLOB_DAT", "R_386_JUMP_SLOT","R_X86_64_GLOB_DAT","R_X86_64_JUMP_SLOT"]:
-                    # Attempt to find the symbol
-                    resolved_address = _resolve_symbol(state, name)
+                    resolved_address = _resolve_symbol_address(state, name)
                     # Store the result
                     b = state.se.Bytes(length=self.bits/8,value=resolved_address)
                     state.memory[address] = b
 
                 elif desc in ["R_386_RELATIVE","R_X86_64_RELATIVE"]:
                     # Adjust it to where the library was loaded
-                    b = state.se.Bytes(value=int(addend)+state.posix.base_addrs[os.path.basename(self.filename)], length=self.bits/8)
+                    b = state.se.Bytes(value=int(A)+state.posix.base_addrs[os.path.basename(self.filename)], length=self.bits/8)
                     # Store it back
+                    state.memory[address] = b
+
+                elif desc in ["R_386_PC32"]:
+                    S = _resolve_symbol_address(state, name)
+                    # Calculate value
+                    b = state.se.Bytes(value=int(S) + A - P, length=self.bits/8)
+                    # Store it
                     state.memory[address] = b
 
                 else:
@@ -550,4 +567,5 @@ import triton
 import subprocess
 import os
 from collections import OrderedDict
+import ctypes
 
