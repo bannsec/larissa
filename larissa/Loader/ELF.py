@@ -280,7 +280,7 @@ class ELF(Loader):
                     logger.info("Ignoring Thread Local Storage relocation.")
 
                 # Copy will need to wait until everything is loaded....
-                elif desc in ["R_386_COPY"]:
+                elif desc in ["R_386_COPY","R_X86_64_COPY"]:
                     S = _resolve_symbol_address(state, name, exclude=[os.path.basename(self.filename)])
                     S = state.memory[int(S):int(S) + (self.bits/8)]
                     state.memory[address] = S
