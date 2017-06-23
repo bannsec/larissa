@@ -88,3 +88,14 @@ def test_loader_reloc_32_nopic_pie_R_386_PC32():
     b = int(state.memory[base_addr+0x60f:base_addr+0x60f+4])
     printf = state.symbol('printf')
     assert int(b) + base_addr + 0x60f == printf.addr - 4
+
+def test_loader_reloc_32_R_386_COPY():
+    proj = larissa.Project(os.path.join(bin_path,"ia32","reloc_copy_nopic_nopie"))
+    state = proj.factory.entry_state()
+    stdout = state.symbol('stdout')
+    assert stdout.source == "reloc_copy_nopic_nopie"
+    stdout_orig = state.symbol('stdout',exclude=["reloc_copy_nopic_nopie"])
+    assert "libc" in stdout_orig.source
+    b = state.memory[stdout.addr:stdout.addr+4]
+    b_orig = state.memory[stdout_orig.addr:stdout_orig.addr+4]
+    assert int(b) == int(b_orig)

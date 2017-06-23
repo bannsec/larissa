@@ -18,9 +18,9 @@ class Factory(object):
             self.project.loader.shared_objects[obj].map_sections(state)
 
         # Perform relocations
-        self.project.loader.main_bin.perform_relocations(state)
         for obj in self.project.loader.shared_objects:
             self.project.loader.shared_objects[obj].perform_relocations(state)
+        self.project.loader.main_bin.perform_relocations(state)
 
         # Return it
         return state
