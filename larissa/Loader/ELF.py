@@ -279,6 +279,10 @@ class ELF(Loader):
                     # http://git.yoctoproject.org/cgit/cgit.cgi/prelink-cross/plain/trunk/src/arch-i386.c?h=cross_prelink_r174
                     logger.info("Ignoring Thread Local Storage relocation.")
 
+                else:
+                    # Call the architecture specific relocation
+                    relocate(state, rel, name)
+
                 """
                 # Copy will need to wait until everything is loaded....
                 elif desc in ["R_386_COPY"]:
@@ -286,10 +290,7 @@ class ELF(Loader):
                     S = state.memory[int(S):int(S) + (self.bits/8)]
                     state.memory[address] = S
                 """
-
-                else:
-                    # Call the architecture specific relocation
-                    relocate(state, rel, name)
+                
 
 
     def section(self, section):
