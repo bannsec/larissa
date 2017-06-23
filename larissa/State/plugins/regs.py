@@ -23,6 +23,9 @@ class Reg(PluginBase):
         self.state = state
         self.name = name
 
+    def __repr__(self):
+        return "<Reg {0}>".format(self.name)
+
     @property
     def name(self):
         """String representation of this register's name."""
@@ -35,5 +38,10 @@ class Reg(PluginBase):
             return
 
         self.__name = name 
+
+    @property
+    def size(self):
+        """Returns size (int) in bits of this register."""
+        return int(getattr(triton.REG,self.name.upper()).getBitSize())
 
 import triton

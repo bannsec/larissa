@@ -20,3 +20,19 @@ def test_regs_amd64_names():
     # Just make sure we have some basics
     regs = ["eax","ebx","ecx","edx","esi","edi","rax","rbx","rcx","rdx","rdi","rsi","rip","rbp","rsp"]
     assert all( hasattr(state.regs,reg) and getattr(state.regs,reg).name == reg for reg in regs)
+
+def test_regs_amd64_sizes():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    assert state.regs.zf.size == 1
+    assert state.regs.al.size == 8
+    assert state.regs.ax.size == 16
+    assert state.regs.eax.size == 32
+    assert state.regs.rax.size == 64
+    assert state.regs.xmm0.size == 128
+    assert state.regs.ymm0.size == 256
+
+def test_reg_amd64_repr():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    assert "rax" in repr(state.regs.rax)
