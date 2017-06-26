@@ -1,6 +1,6 @@
 main:
     build:
-        image: larissa
+        image: bannsec/larissa
         dockerfile: Dockerfile
     encrypted_env_file: env.encrypted
     cached: false
