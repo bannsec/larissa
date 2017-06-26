@@ -4,6 +4,27 @@
 # About
 This is basically a toy project for the moment. I'm curious if I can make Triton be a little more user friendly. I'm planning on modeling interactions after how you would interact through angr and attempt to make the interactions more pythonic.
 
+# Docker
+The build process for larissa is a little convoluted right now. The easiest way to run a version of larissa is to use Docker. Assuming you have docker installed, the following commands should download and run larissa:
+
+__Master__
+```bash
+$ sudo docker pull bannsec/larissa:master
+$ sudo docker run -it --rm bannsec/larissa:master
+```
+
+__dev__
+```bash
+$ sudo docker pull bannsec/larissa:dev
+$ sudo docker run -it --rm bannsec/larissa:dev
+```
+
+Side note: If you have binaries that you want to load up with larissa, you can mount a directory with those images in them. This isn't specific to larissa, rather a docker option. For instance, if you wanted to mount your current directory inside the image as "/home/larissa/data", you would do the following:
+
+```bash
+$ sudo docker run -it --rm -v $PWD:/home/larissa/data bannsec/larissa:dev
+```
+
 # Install
 Be sure you have lib boost, cmake, and python2.7 installed. On Ubuntu, that's:
 
