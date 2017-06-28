@@ -17,12 +17,12 @@ class Memory(PluginBase):
 
         def _store_byte_concrete(self,b,address):
             """Stores byte assuming that it's concrete."""
-            triton.setConcreteMemoryAreaValue(address,[b.value])
+            self.state.ctx.setConcreteMemoryAreaValue(address,[b.value])
 
         def _store_byte_symbolic(self,b,address,ast=False):
             """Stores a byte assuming it is symbolic."""
-            triton.assignSymbolicExpressionToMemory(
-                    triton.newSymbolicExpression(b.value if not ast else b),
+            self.state.ctx.assignSymbolicExpressionToMemory(
+                    self.state.ctx.newSymbolicExpression(b.value if not ast else b),
                     triton.MemoryAccess(address, 1)
                     )
 
@@ -31,7 +31,7 @@ class Memory(PluginBase):
             object = object.encode('ascii')
         
         if type(object) is str:
-            triton.setConcreteMemoryAreaValue(address, object)
+            self.state.ctx.setConcreteMemoryAreaValue(address, object)
             return
 
         if type(object) is Byte:

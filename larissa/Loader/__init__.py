@@ -12,24 +12,24 @@ class Loader(object):
         
         self._load_all_bins()
 
-        self._set_triton_arch()
-        self._set_triton_modes()
+        #self._set_triton_arch(ctx)
+        #self._set_triton_modes(ctx)
 
-    def _set_triton_modes(self):
+    def _set_triton_modes(self, ctx):
 
         # Define symbolic optimizations
-        triton.enableMode(triton.MODE.ALIGNED_MEMORY, False) # TODO: Apparently True is faster? Makes memory access irritating though...
-        triton.enableMode(triton.MODE.ONLY_ON_SYMBOLIZED, True)
+        ctx.enableMode(triton.MODE.ALIGNED_MEMORY, False) # TODO: Apparently True is faster? Makes memory access irritating though...
+        ctx.enableMode(triton.MODE.ONLY_ON_SYMBOLIZED, True)
 
-    def _set_triton_arch(self):
+    def _set_triton_arch(self,ctx):
         """Triton needs to know what arch it's dealing with. Figure it out and set it."""
 
         if self.main_bin.arch in ["x86", "x64"]:
             if self.main_bin.bits == 32:
-                triton.setArchitecture(triton.ARCH.X86)
+                ctx.setArchitecture(triton.ARCH.X86)
 
             elif self.main_bin.bits == 64:
-                triton.setArchitecture(triton.ARCH.X86_64)
+                ctx.setArchitecture(triton.ARCH.X86_64)
 
             else:
                 raise Exception("Unknown bits size of {0}".format(self.main_bin.bits))

@@ -60,7 +60,7 @@ class SolverEngine(PluginBase):
 
         # Create a whip
         whip = self._get_whip(size)
-        whip_var = triton.ast.variable(whip)
+        whip_var = self.state.ctx.getAstContext().variable(whip)
         whip_id = whip.getId()
         
         ast = None
@@ -77,7 +77,7 @@ class SolverEngine(PluginBase):
 
             # If it's concrete, just make it a bv
             if byte.concrete:
-                byte = triton.ast.bv(int(byte), size)
+                byte = self.state.ctx.getAstContext().bv(int(byte), size)
             else:
                 # It's already an ast node.
                 byte = byte.value
@@ -113,7 +113,7 @@ class SolverEngine(PluginBase):
 
             if byte.getBitvectorSize() != size:
                 # Need to extend it
-                byte = triton.ast.zx(size - byte.getBitvectorSize(), byte)
+                byte = self.state.ctx.getAstContext().zx(size - byte.getBitvectorSize(), byte)
 
             #
             # If this is the first one
@@ -137,10 +137,10 @@ class SolverEngine(PluginBase):
 
                 if not used:
                     # We haven't used this, don't let it take up solution space
-                    ast = triton.ast.land( ast, triton.ast.extract((i*8)+7, i*8, vars[0]) == 0)
+                    ast = self.state.ctx.getAstContext().land( ast, self.state.ctx.getAstContext().extract((i*8)+7, i*8, vars[0]) == 0)
 
         
-        return [option[whip_id].getValue() for option in triton.getModels(triton.ast.assert_(ast),n)]
+        return [option[whip_id].getValue() for option in self.state.ctx.getModels(self.state.ctx.getAstContext().assert_(ast),n)]
 
     def any_n_str(self, obj, n):
         """Return a list of n possible strings for this object."""
@@ -199,7 +199,7 @@ class SolverEngine(PluginBase):
 
         # Create it if we need to
         if bits not in self._whip:
-            self._whip[bits] = triton.newSymbolicVariable(bits)
+            self._whip[bits] = self.state.ctx.newSymbolicVariable(bits)
 
         return self._whip[bits]
 
@@ -212,7 +212,6 @@ class SolverEngine(PluginBase):
 
 from .Byte import Byte
 from .Bytes import Bytes
-import triton
 from binascii import unhexlify
 
 import logging

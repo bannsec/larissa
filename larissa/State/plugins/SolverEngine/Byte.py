@@ -32,7 +32,7 @@ class Byte(object):
 
         if symbolic:
             # Whip up a new variable byte
-            self.value = triton.ast.variable(triton.newSymbolicVariable(8))
+            self.value = self.state.ctx.getAstContext().variable(self.state.ctx.newSymbolicVariable(8))
 
     def pp(self):
         """Pretty prints this bytes object as assembly instructions."""
@@ -49,14 +49,14 @@ class Byte(object):
             return
 
         # Check if this is a symbolic value or not
-        if self.address in triton.getSymbolicMemory():
+        if self.address in self.state.ctx.getSymbolicMemory():
             # TODO: Not clear yet what i should be storing... AST? FullAST? Expression? Variable?
             # Storing Full Ast For Now
-            self.value = triton.getFullAst(triton.getSymbolicMemory()[self.address].getAst())
+            self.value = self.state.ctx.getFullAst(self.state.ctx.getSymbolicMemory()[self.address].getAst())
 
         else:
             # Concrete memory
-            self.value = triton.getConcreteMemoryValue(triton.MemoryAccess(self.address,1))
+            self.value = self.state.ctx.getConcreteMemoryValue(triton.MemoryAccess(self.address,1))
 
     def __repr__(self):
         attribs = ["Byte"]
@@ -112,7 +112,7 @@ class Byte(object):
 
     @value.setter
     def value(self, value):
-        if type(value) not in [int, long, type(None), type(triton.ast.bv(1,1))]:
+        if type(value) not in [int, long, type(None), type(self.state.ctx.getAstContext().bv(1,1))]:
             logger.error("Unhandled Byte value of type {0}".format(type(value)))
             return
 

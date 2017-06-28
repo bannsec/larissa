@@ -5,6 +5,12 @@ class State(object):
 
     def __init__(self, project):
         self.project = project
+
+        # Setup a new Triton context
+        self.ctx = triton.TritonContext()
+        self.project.loader._set_triton_arch(self.ctx)
+        self.project.loader._set_triton_modes(self.ctx)
+
         self._populate_plugins()
 
     def symbol(self, name, exclude=None):
@@ -89,6 +95,16 @@ class State(object):
     # Properties #
     ##############
 
+    @property
+    def ctx(self):
+        """The Triton context object for this state."""
+        return self.__ctx
+
+    @ctx.setter
+    def ctx(self, ctx):
+        # TODO: Check type...
+        self.__ctx = ctx
+    
     @property
     def project(self):
         return self.__project

@@ -13,7 +13,7 @@ class Regs(PluginBase):
         self._init_registers()
 
     def _init_registers(self):
-        for reg in triton.getAllRegisters():
+        for reg in self.state.ctx.getAllRegisters():
             setattr(self,reg.getName(),Reg(self.state, reg.getName()))
 
 class Reg(PluginBase):
@@ -42,6 +42,16 @@ class Reg(PluginBase):
     @property
     def size(self):
         """Returns size (int) in bits of this register."""
-        return int(getattr(triton.REG,self.name.upper()).getBitSize())
+        if self.state.project.loader.main_bin.arch == "x86":
+            my_reg = triton.REG.X86
+        elif self.state.project.loader.main_bin.arch == "x64":
+            my_reg = triton.REG.X86_64
+        else:
+            logger.error("Unkown architecture for reg of {0}".format(self.state.project.loader.main_bin.arch))
+
+        return int(
+                self.state.ctx.Register(
+                    getattr(my_reg,self.name.upper())
+                    ).getBitSize())
 
 import triton
