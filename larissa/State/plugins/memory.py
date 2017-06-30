@@ -120,11 +120,11 @@ class Memory(PluginBase):
             obj = self.state.project.loader._lookup_obj_by_name(name)
 
             # Loop through the segments
-            for seg in self.state.project.loader.main_bin.segments:
+            for seg in obj.segments:
                 if seg['p_type'] != "PT_LOAD":
                     continue
 
-                map_base = base
+                map_base = base if obj.address == 0 else 0
                 start = map_base + seg['p_vaddr']
                 end = start + seg['p_memsz']
 

@@ -108,6 +108,8 @@ class ELF(Loader):
             if load_segments.index(segment) == 0:
                 state.posix.base_addrs[os.path.basename(self.filename)] = vaddr
 
+            logger.debug("Loading segment for {0} at {1} with perms {2}".format(self.filename, hex(vaddr), page.prot_str))
+
         """
         # Not all sections are loadable
         loadable_sections = [section for section in self.sections if section['sh_flags'] & 2]
@@ -135,31 +137,6 @@ class ELF(Loader):
                 if section['sh_flags'] & 0x4 > 0:
                     page.execute = True
 
-        """
-        ###############
-        # Relocations #
-        ###############
-
-        # Setup plt
-        #for pltIndex in range(len(customRelocation)):
-        #    customRelocation[pltIndex][2] = BASE_PLT + pltIndex
-
-        """
-        # Perform our own relocations
-        symbols = elf.getSymbolsTable()
-        relocations = elf.getRelocationTable()
-        for rel in relocations:
-            symbolName = symbols[rel.getSymidx()].getName()
-            symbolRelo = rel.getOffset()
-            # TODO: Implement hooking...
-            #
-            #for crel in customRelocation:
-            #    if symbolName == crel[0]:
-            #        debug('Hooking %s' %(symbolName))
-            #        setConcreteMemoryValue(MemoryAccess(symbolRelo, CPUSIZE.QWORD, crel[2]))
-            #        break
-
-        return elf
         """
 
         # Fixup mmap base
