@@ -196,3 +196,24 @@ def test_memory_pages_iterator():
     proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
     state = proj.factory.entry_state()
     list(state.memory.pages)
+
+def test_memory_64_nopic_nopie_map(capsys):
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    out, err = capsys.readouterr()
+    map = state.memory.map
+    out, err = capsys.readouterr()
+
+    assert "0x400000" in out
+    assert "0x400744" in out
+    assert "0x600e10" in out
+    assert "0x601040" in out
+    assert "---" not in out
+
+def test_memory_64_pic_pie_map(capsys):
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_pic_pie"))
+    state = proj.factory.entry_state()
+    out, err = capsys.readouterr()
+    map = state.memory.map
+    out, err = capsys.readouterr()
+    assert "---" not in out

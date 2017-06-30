@@ -110,3 +110,4 @@ def test_loader_reloc_R_X86_64_COPY():
     b = state.memory[stdout.addr:stdout.addr+8]
     b_orig = state.memory[stdout_orig.addr:stdout_orig.addr+8]
     assert int(b) == int(b_orig)
+
