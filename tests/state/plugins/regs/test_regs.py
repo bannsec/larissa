@@ -26,13 +26,26 @@ def test_regs_amd64_sizes():
     state = proj.factory.entry_state()
     assert state.regs.zf.size == 1
     assert state.regs.al.size == 8
+    assert state.regs.al.bytes.length == 1
     assert state.regs.ax.size == 16
+    assert state.regs.ax.bytes.length == 2
     assert state.regs.eax.size == 32
+    assert state.regs.eax.bytes.length == 4
     assert state.regs.rax.size == 64
+    assert state.regs.rax.bytes.length == 8
     assert state.regs.xmm0.size == 128
+    assert state.regs.xmm0.bytes.length == 16
     assert state.regs.ymm0.size == 256
+    assert state.regs.ymm0.bytes.length == 32
 
 def test_reg_amd64_repr():
     proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
     state = proj.factory.entry_state()
     assert "rax" in repr(state.regs.rax)
+
+def test_reg_set_constant():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    assert int(state.regs.rax.bytes) == 0
+    state.regs.rax.set(31337)
+    assert int(state.regs.rax.bytes) == 31337

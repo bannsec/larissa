@@ -16,12 +16,25 @@ class Regs(PluginBase):
         for reg in self.state.ctx.getAllRegisters():
             setattr(self,reg.getName(),Reg(self.state, reg.getName()))
 
+
+
 class Reg(PluginBase):
     """Abstract specific register"""
 
     def __init__(self, state, name):
         self.state = state
         self.name = name
+
+    def set(self, value):
+        """Set this register to a given value."""
+
+        # Symbolic not working yet
+        if type(value) not in [int, long]:
+            logger.error("Unsupported set type for register of {0}".format(type(value)))
+            return
+
+        # Concrete
+        self.state.ctx.setConcreteRegisterValue(self.state.ctx.Register(getattr(self._triton_type, self.name.upper()),value))
 
     def __repr__(self):
         return "<Reg {0}>".format(self.name)
@@ -42,16 +55,36 @@ class Reg(PluginBase):
     @property
     def size(self):
         """Returns size (int) in bits of this register."""
+        return int(self._triton_class.getBitSize())
+
+    @property
+    def _triton_type(self):
+        """Returns a triton type object for this object (i.e.: triton.REG.X86 or triton.REG.X86_64)"""
         if self.state.project.loader.main_bin.arch == "x86":
-            my_reg = triton.REG.X86
+            return triton.REG.X86
         elif self.state.project.loader.main_bin.arch == "x64":
-            my_reg = triton.REG.X86_64
+            return triton.REG.X86_64
         else:
             logger.error("Unkown architecture for reg of {0}".format(self.state.project.loader.main_bin.arch))
 
-        return int(
-                self.state.ctx.Register(
-                    getattr(my_reg,self.name.upper())
-                    ).getBitSize())
+    @property
+    def _triton_class(self):
+        """Returns a triton register object for this register. (ctx.Register())"""
+        return self.state.ctx.Register(getattr(self._triton_type, self.name.upper()))
+
+
+    @property
+    def bytes(self):
+        """Return a bytes object representing this register."""
+        me = self.state.ctx.buildSymbolicRegister(self._triton_class)
+
+        if me.isSymbolized():
+            logger.error("Not handling symbolic registers yet.")
+            return
+
+        # Concrete
+        # TODO: This will fail for flags such as ZF
+        return self.state.se.Bytes(length=self.size/8, value=me.evaluate())
+
 
 import triton
