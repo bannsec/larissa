@@ -49,3 +49,12 @@ def test_reg_set_constant():
     assert int(state.regs.rax.bytes) == 0
     state.regs.rax.set(31337)
     assert int(state.regs.rax.bytes) == 31337
+
+def test_reg_int_hex_str():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    state.regs.rbx.set(12345)
+    assert int(state.regs.rbx) == 12345
+    assert hex(state.regs.rbx).strip("L") == hex(12345)
+    # Endianness stuff?
+    assert str(state.regs.rbx) == '90\x00\x00\x00\x00\x00\x00'

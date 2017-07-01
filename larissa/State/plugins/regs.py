@@ -28,6 +28,8 @@ class Reg(PluginBase):
     def set(self, value):
         """Set this register to a given value."""
 
+        # TODO: Size check...
+
         # Symbolic not working yet
         if type(value) not in [int, long]:
             logger.error("Unsupported set type for register of {0}".format(type(value)))
@@ -38,6 +40,15 @@ class Reg(PluginBase):
 
     def __repr__(self):
         return "<Reg {0}>".format(self.name)
+
+    def __int__(self):
+        return int(self.bytes)
+
+    def __hex__(self):
+        return hex(self.bytes)
+
+    def __str__(self):
+        return str(self.bytes)
 
     @property
     def name(self):
