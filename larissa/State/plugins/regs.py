@@ -94,8 +94,7 @@ class Reg(PluginBase):
             return
 
         # Concrete
-        # TODO: This will fail for flags such as ZF
-        return self.state.se.Bytes(length=self.size/8, value=me.evaluate())
+        return self.state.se.Bytes(length=self.size/8 or 1, value=me.evaluate())
 
 
 import triton

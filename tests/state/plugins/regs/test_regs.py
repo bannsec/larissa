@@ -58,3 +58,9 @@ def test_reg_int_hex_str():
     assert hex(state.regs.rbx).strip("L") == hex(12345)
     # Endianness stuff?
     assert str(state.regs.rbx) == '90\x00\x00\x00\x00\x00\x00'
+
+def test_reg_int_zf():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    state.regs.zf.set(1)
+    assert int(state.regs.zf) == 1
