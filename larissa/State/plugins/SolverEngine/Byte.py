@@ -11,6 +11,11 @@ class Byte(object):
         """
         self.state = state
 
+        # Value type check
+        if type(value) not in [int, long, type(None), type(state.ctx.getAstContext().bv(1,1))]:
+            logger.error("Invalid value type of {0}.".format(type(value)))
+            return
+
         # These two are mutually exclusive for now
         if address != None and symbolic:
             logger.error("Cannot specify both address and symbolic for now.")
@@ -36,7 +41,7 @@ class Byte(object):
         # If address is passed, grab it from triton
         self.address = address
 
-        if symbolic:
+        if symbolic and self.value == None:
             # Whip up a new variable byte
             self.value = self.state.ctx.getAstContext().variable(self.state.ctx.newSymbolicVariable(8))
 
