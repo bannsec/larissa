@@ -121,3 +121,10 @@ def test_solverengine_byte_overload_hex():
     state = proj.factory.entry_state()
     b = state.se.Byte(value=0x26)
     assert hex(b) == "0x26"
+
+def test_solverengine_byte_symbol_too_large():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    b = state.ctx.getAstContext().variable(state.ctx.newSymbolicVariable(16))
+    c = state.se.Byte(value=b,symbolic=True)
+    assert not hasattr(c,"value")
