@@ -134,3 +134,10 @@ def test_solverengine_byte_invalid_value_type():
     state = proj.factory.entry_state()
     b = state.se.Byte(value="test")
     assert not hasattr(b,"value")
+
+def test_solverengine_byte_set_symbolic_value():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    b = state.se.Byte(symbolic=True)
+    c = state.se.Byte(symbolic=True, value=b.value)
+    assert b.value.equalTo(c.value)
