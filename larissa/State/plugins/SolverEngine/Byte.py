@@ -21,8 +21,14 @@ class Byte(object):
             logger.error("Cannot specify both address and value for now.")
             return
 
-        if value != None and value > 0xff:
+        # Concrete size check
+        if value != None and not symbolic and value > 0xff:
             logger.error("Value too large to fit in Byte.")
+            return
+
+        # Symbolic size check
+        if value != None and symbolic and value.getBitvectorSize() != 8:
+            logger.error("Symbolic value incorrect size for Byte. Got {0} expected 8".format(value.getBitvectorSize()))
             return
 
         self.value = value
