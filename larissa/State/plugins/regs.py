@@ -36,7 +36,13 @@ class Reg(PluginBase):
             return
 
         # Concrete
+        # Have to set it to concrete first...
+        self.state.ctx.concretizeRegister(self.state.ctx.Register(getattr(self._triton_type, self.name.upper()),value))
         self.state.ctx.setConcreteRegisterValue(self.state.ctx.Register(getattr(self._triton_type, self.name.upper()),value))
+
+    def make_symbolic(self):
+        """Call this to explicity make this register symbolic."""
+        self.state.ctx.convertRegisterToSymbolicVariable(self._triton_class)
 
     def __repr__(self):
         return "<Reg {0}>".format(self.name)
@@ -83,11 +89,15 @@ class Reg(PluginBase):
         """Returns a triton register object for this register. (ctx.Register())"""
         return self.state.ctx.Register(getattr(self._triton_type, self.name.upper()))
 
+    @property
+    def _triton_symbolic_register(self):
+        """Returns results of ctx.buildSymbolicRegister(thisregister)"""
+        return self.state.ctx.buildSymbolicRegister(self._triton_class)
 
     @property
     def bytes(self):
         """Return a bytes object representing this register."""
-        me = self.state.ctx.buildSymbolicRegister(self._triton_class)
+        me = self._triton_symbolic_register
 
         if me.isSymbolized():
             logger.error("Not handling symbolic registers yet.")

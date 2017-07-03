@@ -64,3 +64,19 @@ def test_reg_int_zf():
     state = proj.factory.entry_state()
     state.regs.zf.set(1)
     assert int(state.regs.zf) == 1
+
+def test_reg_symbolic_to_concrete():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+
+    eax = state.regs.eax._triton_symbolic_register
+    assert not eax.isSymbolized()
+
+    state.regs.eax.make_symbolic()
+    eax = state.regs.eax._triton_symbolic_register
+    assert eax.isSymbolized()
+    
+    state.regs.eax.set(1337)
+    eax = state.regs.eax._triton_symbolic_register
+    assert not eax.isSymbolized()
+    assert int(state.regs.eax) == 1337
