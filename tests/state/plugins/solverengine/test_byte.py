@@ -128,3 +128,9 @@ def test_solverengine_byte_symbol_too_large():
     b = state.ctx.getAstContext().variable(state.ctx.newSymbolicVariable(16))
     c = state.se.Byte(value=b,symbolic=True)
     assert not hasattr(c,"value")
+
+def test_solverengine_byte_invalid_value_type():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+    b = state.se.Byte(value="test")
+    assert not hasattr(b,"value")
