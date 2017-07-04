@@ -80,3 +80,13 @@ def test_reg_symbolic_to_concrete():
     eax = state.regs.eax._triton_symbolic_register
     assert not eax.isSymbolized()
     assert int(state.regs.eax) == 1337
+
+def test_reg_symbolic_bytes():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+
+    # Make a subset of eax symbolic
+    state.regs.al.make_symbolic()
+    eax = state.regs.eax.bytes
+
+    assert set(state.se.any_n_int(eax,1000)) == set([x for x in range(0x100)])

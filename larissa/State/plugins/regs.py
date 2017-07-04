@@ -100,8 +100,7 @@ class Reg(PluginBase):
         me = self._triton_symbolic_register
 
         if me.isSymbolized():
-            logger.error("Not handling symbolic registers yet.")
-            return
+            return self.state.se.Bytes(value=me)
 
         # Concrete
         return self.state.se.Bytes(length=self.size/8 or 1, value=me.evaluate())
