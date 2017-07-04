@@ -1,6 +1,9 @@
 import logging
 logger = logging.getLogger("larissa.State.plugins.SolverEngine.Bytes")
 
+def roundup(x,base=4096):
+    return x if x % base == 0 else x + base - x % base
+
 class Bytes(object):
 
     def __init__(self, state, address=None, length=1, symbolic = False, value = None, *args, **kwargs):
@@ -27,7 +30,7 @@ class Bytes(object):
 
         # Infer size of value if object is ast
         if type(value) is ast_type(self.state):
-            length = (value.getBitvectorSize() / 8)
+            length = roundup(value.getBitvectorSize(),base=8) / 8
             symbolic = True
 
         self.length = length
@@ -55,7 +58,7 @@ class Bytes(object):
             return
 
         # Length check
-        if self.length != (value.getBitvectorSize() / 8):
+        if self.length != (roundup(value.getBitvectorSize(),8) / 8):
             logger.error("Length mismatch. Stated length is {0} but discovered length is {1}".format(self.length, value.getBitvectorSize() / 8))
             return
 
@@ -65,8 +68,15 @@ class Bytes(object):
         # TODO: This doesn't account for Big Endian
         # Loop through each byte, extract, and create a Byte object for it.
         for i in range(0,self.length):
+            top = (i*8)+7
+            bottom = i*8
+
+            # Adjust if we don't have a full byte here
+            if top > value.getBitvectorSize():
+                top = value.getBitvectorSize() - 1
+
             self.bytes.append(
-                self.state.se.Byte(symbolic=True, value=ast.extract((i*8)+7,i*8,value))
+                self.state.se.Byte(symbolic=True, value=ast.extract(top,bottom,value))
             )
 
 

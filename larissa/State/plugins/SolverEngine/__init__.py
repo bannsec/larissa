@@ -86,14 +86,12 @@ class SolverEngine(PluginBase):
             # Track extract statements
             #
 
-            # The extract statement is kind 173
-            if byte.getKind() == 173:
+            if byte.getKind() == triton.AST_NODE.EXTRACT:
                 childs = byte.getChilds()
 
                 if len(childs) == 3:
 
-                    # 233 is the root ast variable
-                    if childs[2].getKind() == 233:
+                    if childs[2].getKind() == triton.AST_NODE.VARIABLE:
                         
                         # Make clear some assumptions for now
                         assert childs[0].getValue() - 7 == childs[1].getValue()
@@ -102,10 +100,33 @@ class SolverEngine(PluginBase):
                         # If this is the first time seeing it
                         if childs[2].getHash() not in vars_seen:
                             # Init the vector
-                            vars_seen[childs[2].getHash()] = [childs[2]] + [False] * (childs[2].getBitvectorSize() / 8)
+                            # This amounts to a dictionary of lists, indexed by the unique hash id of the variable (i.e.: symvar_0)
+                            # The list is meant to keep track of what bits we've seen in all these expressions, so we can ignore the bits that aren't used
+                            # There is likely a better way to do this... This whole thing is because Triton gives extract expressions back. If we're not careful, we can get extra results for things we don't care about (bits that aren't involved in this expression)
+                            # Structure: [astNode, bool slice1, bool slice2, ... bool slice n]
+                            #vars_seen[childs[2].getHash()] = [childs[2]] + [False] * (childs[2].getBitvectorSize() / 8)
+
+                            # Changing this to a bitmask instead to account for flags and other bit level adjustments
+                            vars_seen[childs[2].getHash()] = [childs[2], 2**(childs[2].getBitvectorSize())-1]
 
                         # Mark off that we've seen this slice
-                        vars_seen[childs[2].getHash()][(childs[1].getValue()/8)+1] = True
+                        #vars_seen[childs[2].getHash()][(childs[1].getValue()/8)+1] = True
+
+                        # Mask off the bitmask of what we're using
+                        #high = childs[0].getValue()
+                        #low = childs[1].getValue()
+
+                        # This is a hackish way to create a bitmask between two numbers...
+                        """
+                        mask = 0
+                        i = low
+                        while mask <= (2**high-1):
+                            mask |= 1 << i
+                            i += 1
+                        """
+                        mask = childs[2].getBitvectorMask()
+
+                        vars_seen[childs[2].getHash()][1] &= ~mask
 
             #
             # Make sure it's the right size
@@ -132,12 +153,22 @@ class SolverEngine(PluginBase):
         # Loop through the vars we've seen and zero out any parts we're not using
         for vars in vars_seen.values():
 
+            # New approach using bitmask....
+            this_ast = vars[0]
+            mask = vars[1]
+
+            # If there's bits unused, tell the solver to ignore them
+            if mask != 0:
+                ast = self.state.ctx.getAstContext().land( ast, this_ast & mask == 0)
+
+            """
             # Loop through the mask
             for i, used in enumerate(vars[1:]):
 
                 if not used:
                     # We haven't used this, don't let it take up solution space
                     ast = self.state.ctx.getAstContext().land( ast, self.state.ctx.getAstContext().extract((i*8)+7, i*8, vars[0]) == 0)
+            """
 
         
         return [option[whip_id].getValue() for option in self.state.ctx.getModels(self.state.ctx.getAstContext().assert_(ast),n)]
@@ -213,6 +244,7 @@ class SolverEngine(PluginBase):
 from .Byte import Byte
 from .Bytes import Bytes
 from binascii import unhexlify
+import triton
 
 import logging
 logger = logging.getLogger("larissa.State.plugins.SolverEngine")

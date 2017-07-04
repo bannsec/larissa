@@ -32,9 +32,27 @@ class Byte(object):
             return
 
         # Symbolic size check
-        if value != None and symbolic and value.getBitvectorSize() != 8:
-            logger.error("Symbolic value incorrect size for Byte. Got {0} expected 8".format(value.getBitvectorSize()))
-            return
+        if value != None and symbolic:
+            # Zero extend if under a byte
+            # TODO: How to know when to sign extend?
+            if value.getBitvectorSize() < 8:
+                ast = state.ctx.getAstContext()
+
+                # This isn't really tested... Maybe it works tho?
+                if not value.isSigned():
+                    value = ast.zx( 8 - value.getBitvectorSize(), value)
+                else:
+                    value = ast.sx( 8 - value.getBitvectorSize(), value)
+        
+            if value.getBitvectorSize() != 8:
+                logger.error("Symbolic value incorrect size for Byte. Got {0} expected 8".format(value.getBitvectorSize()))
+                return
+
+            # Attempt simplifcation TODO: Do this somewhere else?
+            try:
+                value = state.ctx.simplify(value,True)
+            except:
+                pass
 
         self.value = value
 

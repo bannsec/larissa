@@ -155,21 +155,21 @@ def test_solverengine_bytes_symbolic_initial_value():
     # Do some context work
     ast_ctx = state.ctx.getAstContext()
 
-    assert b[0].value.equalTo(ast_ctx.extract(7,0,eax_sym))
-    assert b[1].value.equalTo(ast_ctx.extract(15,8,eax_sym))
-    assert b[2].value.equalTo(ast_ctx.extract(23,16,eax_sym))
-    assert b[3].value.equalTo(ast_ctx.extract(31,24,eax_sym))
+    assert b[0].value.equalTo(state.ctx.simplify(ast_ctx.extract(7,0,eax_sym),True))
+    assert b[1].value.equalTo(state.ctx.simplify(ast_ctx.extract(15,8,eax_sym),True))
+    assert b[2].value.equalTo(state.ctx.simplify(ast_ctx.extract(23,16,eax_sym),True))
+    assert b[3].value.equalTo(state.ctx.simplify(ast_ctx.extract(31,24,eax_sym),True))
 
     # Bad type check (no change to input)
     b._store_value_symbolic("blerg")
-    assert b[0].value.equalTo(ast_ctx.extract(7,0,eax_sym))
-    assert b[1].value.equalTo(ast_ctx.extract(15,8,eax_sym))
-    assert b[2].value.equalTo(ast_ctx.extract(23,16,eax_sym))
-    assert b[3].value.equalTo(ast_ctx.extract(31,24,eax_sym))
+    assert b[0].value.equalTo(state.ctx.simplify(ast_ctx.extract(7,0,eax_sym),True))
+    assert b[1].value.equalTo(state.ctx.simplify(ast_ctx.extract(15,8,eax_sym),True))
+    assert b[2].value.equalTo(state.ctx.simplify(ast_ctx.extract(23,16,eax_sym),True))
+    assert b[3].value.equalTo(state.ctx.simplify(ast_ctx.extract(31,24,eax_sym),True))
 
     # Bad length check (no change to input)
     b.length = 500
-    assert b[0].value.equalTo(ast_ctx.extract(7,0,eax_sym))
-    assert b[1].value.equalTo(ast_ctx.extract(15,8,eax_sym))
-    assert b[2].value.equalTo(ast_ctx.extract(23,16,eax_sym))
-    assert b[3].value.equalTo(ast_ctx.extract(31,24,eax_sym))
+    assert b[0].value.equalTo(state.ctx.simplify(ast_ctx.extract(7,0,eax_sym),True))
+    assert b[1].value.equalTo(state.ctx.simplify(ast_ctx.extract(15,8,eax_sym),True))
+    assert b[2].value.equalTo(state.ctx.simplify(ast_ctx.extract(23,16,eax_sym),True))
+    assert b[3].value.equalTo(state.ctx.simplify(ast_ctx.extract(31,24,eax_sym),True))

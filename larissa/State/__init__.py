@@ -11,6 +11,7 @@ class State(object):
         self.project.loader._set_triton_arch(self.ctx)
         self.project.loader._set_triton_modes(self.ctx)
 
+        #self._add_callbacks()
         self._populate_plugins()
 
     def symbol(self, name, exclude=None):
@@ -90,6 +91,18 @@ class State(object):
             # Store that we loaded this
             self.plugins.append(plugin_object)
 
+    """
+    def _add_callbacks(self):
+        "" "Add any wanted Triton callbacks. Call this only on instantiation of new class." ""
+
+        ctx = self.ctx
+
+        def do_simplify(ast):
+            return ast
+
+
+        ctx.addCallback(do_simplify, triton.CALLBACK.SYMBOLIC_SIMPLIFICATION)
+    """
 
     ##############
     # Properties #

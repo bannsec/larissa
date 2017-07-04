@@ -90,3 +90,10 @@ def test_reg_symbolic_bytes():
     eax = state.regs.eax.bytes
 
     assert set(state.se.any_n_int(eax,1000)) == set([x for x in range(0x100)])
+
+    # Make sure we can get symbolic flag
+    state.regs.zf.make_symbolic()
+    zf = state.regs.zf.bytes
+
+    # No constraints. This should be 0 or 1
+    assert set(state.se.any_n_int(zf, 10)) == set((0,1))
