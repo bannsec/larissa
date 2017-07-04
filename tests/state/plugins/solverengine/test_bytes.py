@@ -135,3 +135,41 @@ def test_solverengine_bytes_long_addr():
     state = proj.factory.entry_state()
     b = state.memory[0x0040053cL: 0x0040053cL + 5]
     assert str(b) == "UH\x89\xe5H"
+
+def test_solverengine_bytes_symbolic_initial_value():
+    proj = larissa.Project(os.path.join(bin_path,"amd64","simple_nopic_nopie"))
+    state = proj.factory.entry_state()
+
+    # Create some example symbolic bits
+    state.regs.eax.make_symbolic()
+
+    # This is the triton symbolic variable
+    eax_sym = state.regs.eax._triton_symbolic_register
+
+    # Try to create new Bytes object from it
+    b = state.se.Bytes(value=eax_sym)
+
+    assert b.length == 4
+    assert b.symbolic == True
+
+    # Do some context work
+    ast_ctx = state.ctx.getAstContext()
+
+    assert b[0].value.equalTo(ast_ctx.extract(7,0,eax_sym))
+    assert b[1].value.equalTo(ast_ctx.extract(15,8,eax_sym))
+    assert b[2].value.equalTo(ast_ctx.extract(23,16,eax_sym))
+    assert b[3].value.equalTo(ast_ctx.extract(31,24,eax_sym))
+
+    # Bad type check (no change to input)
+    b._store_value_symbolic("blerg")
+    assert b[0].value.equalTo(ast_ctx.extract(7,0,eax_sym))
+    assert b[1].value.equalTo(ast_ctx.extract(15,8,eax_sym))
+    assert b[2].value.equalTo(ast_ctx.extract(23,16,eax_sym))
+    assert b[3].value.equalTo(ast_ctx.extract(31,24,eax_sym))
+
+    # Bad length check (no change to input)
+    b.length = 500
+    assert b[0].value.equalTo(ast_ctx.extract(7,0,eax_sym))
+    assert b[1].value.equalTo(ast_ctx.extract(15,8,eax_sym))
+    assert b[2].value.equalTo(ast_ctx.extract(23,16,eax_sym))
+    assert b[3].value.equalTo(ast_ctx.extract(31,24,eax_sym))
