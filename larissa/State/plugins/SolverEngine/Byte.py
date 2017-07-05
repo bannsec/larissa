@@ -48,12 +48,6 @@ class Byte(object):
                 logger.error("Symbolic value incorrect size for Byte. Got {0} expected 8".format(value.getBitvectorSize()))
                 return
 
-            # Attempt simplifcation TODO: Do this somewhere else?
-            try:
-                value = state.ctx.simplify(value,True)
-            except:
-                pass
-
         self.value = value
 
         # If address is passed, grab it from triton
@@ -144,6 +138,13 @@ class Byte(object):
         if type(value) not in [int, long, type(None), type(self.state.ctx.getAstContext().bv(1,1))]:
             logger.error("Unhandled Byte value of type {0}".format(type(value)))
             return
+
+        if type(value) is type(self.state.ctx.getAstContext().bv(1,1)):
+            # Attempt simplifcation TODO: Do this somewhere else?
+            try:
+                value = self.state.ctx.simplify(value,True)
+            except:
+                pass
 
         self.__value = value
 
