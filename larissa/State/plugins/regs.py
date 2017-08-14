@@ -37,8 +37,10 @@ class Reg(PluginBase):
 
         # Concrete
         # Have to set it to concrete first...
-        self.state.ctx.concretizeRegister(self.state.ctx.Register(getattr(self._triton_type, self.name.upper()),value))
-        self.state.ctx.setConcreteRegisterValue(self.state.ctx.Register(getattr(self._triton_type, self.name.upper()),value))
+        #self.state.ctx.concretizeRegister(self.state.ctx.Register(getattr(self._triton_type, self.name.upper()),value))
+        #self.state.ctx.setConcreteRegisterValue(self.state.ctx.Register(getattr(self._triton_type, self.name.upper()),value))
+        self.state.ctx.concretizeRegister(self._triton_symbolic_register)
+        self.state.ctx.setConcreteRegisterValue(self._triton_symbolic_register)
 
     def make_symbolic(self):
         """Call this to explicity make this register symbolic."""
@@ -86,7 +88,7 @@ class Reg(PluginBase):
 
     @property
     def _triton_class(self):
-        """Returns a triton register object for this register. (ctx.Register())"""
+        """Returns a triton register object for this register. (ctx.registers.<this>)"""
         #return self.state.ctx.Register(getattr(self._triton_type, self.name.upper()))
         return getattr(self.state.ctx.registers,self.name.lower())
 
