@@ -29,7 +29,7 @@ $ sudo docker run -it --rm -v $PWD:/home/larissa/data bannsec/larissa:dev
 Be sure you have lib boost, cmake, and python2.7 installed. On Ubuntu, that's:
 
 ```bash
-$ sudo apt-get install libboost-dev cmake python2.7-dev
+$ sudo apt-get install libboost-dev cmake python2.7-dev gcc g++
 ```
 
 Installation has only been tested into a virtual environment.
