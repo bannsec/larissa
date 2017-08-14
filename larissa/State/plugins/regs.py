@@ -87,7 +87,8 @@ class Reg(PluginBase):
     @property
     def _triton_class(self):
         """Returns a triton register object for this register. (ctx.Register())"""
-        return self.state.ctx.Register(getattr(self._triton_type, self.name.upper()))
+        #return self.state.ctx.Register(getattr(self._triton_type, self.name.upper()))
+        return getattr(self.state.ctx.registers,self.name.lower())
 
     @property
     def _triton_symbolic_register(self):
