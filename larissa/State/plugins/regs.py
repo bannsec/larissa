@@ -39,8 +39,8 @@ class Reg(PluginBase):
         # Have to set it to concrete first...
         #self.state.ctx.concretizeRegister(self.state.ctx.Register(getattr(self._triton_type, self.name.upper()),value))
         #self.state.ctx.setConcreteRegisterValue(self.state.ctx.Register(getattr(self._triton_type, self.name.upper()),value))
-        self.state.ctx.concretizeRegister(self._triton_symbolic_register)
-        self.state.ctx.setConcreteRegisterValue(self._triton_symbolic_register)
+        self.state.ctx.concretizeRegister(self._triton_class)
+        self.state.ctx.setConcreteRegisterValue(self._triton_class)
 
     def make_symbolic(self):
         """Call this to explicity make this register symbolic."""
