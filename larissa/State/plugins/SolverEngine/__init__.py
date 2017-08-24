@@ -171,7 +171,7 @@ class SolverEngine(PluginBase):
             """
 
         
-        return [option[whip_id].getValue() for option in self.state.ctx.getModels(self.state.ctx.getAstContext().assert_(ast),n)]
+        return [option[whip_id].getValue() for option in self.state.ctx.getModels(ast,n)]
 
     def any_n_str(self, obj, n):
         """Return a list of n possible strings for this object."""
