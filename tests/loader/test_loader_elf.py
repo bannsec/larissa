@@ -35,6 +35,8 @@ def test_loader_basic_page_permissions():
     assert state.memory[bss.addr].page.write == True
     assert state.memory[bss.addr].page.execute == False
 
+"""
+# Removing triton_elf for now since they moved to lief
 def test_loader_triton_elf():
     for arch in ["amd64","ia32"]:
         for binary in ["simple_pic_pie","simple_nopic_nopie"]:
@@ -47,6 +49,7 @@ def test_loader_triton_elf():
             # Shared libs
             for lib in proj.loader.shared_objects.values():
                 lib.triton_elf.getSize()
+"""
 
 def test_loader_mmap_base_not_mapped():
     # Make sure we have adjusted mmap base from loading
