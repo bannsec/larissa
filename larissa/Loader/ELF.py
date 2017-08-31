@@ -512,10 +512,10 @@ class ELF(Loader):
 
         return symbols
 
-    @property
-    def triton_elf(self):
-        """Returns a Triton elf object for this binary."""
-        return lief.parse(self.project.filename)
+    #@property
+    #def triton_elf(self):
+    #    """Returns a Triton elf object for this binary."""
+    #    return lief.parse(self.project.filename)
             
 
 
@@ -528,7 +528,7 @@ from elftools.elf.descriptions import describe_reloc_type
 from larissa.Project import Project
 from larissa.Loader.Symbol import Symbol
 import triton
-import lief
+#import lief
 import subprocess
 import os
 from collections import OrderedDict
